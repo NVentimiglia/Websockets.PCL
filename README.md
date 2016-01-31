@@ -20,8 +20,19 @@ Coming Soon
 ### Usage
 
 `````
+        void Configure()
+        {
+            // Call in your platform (non-pcl) startup            
+            // 1) Link in your main activity or AppDelegate or whatever
+            Websockets.Droid.WebsocketConnectionDroid.Link();
+            Websockets.Droid.WebsocketConnectionIos.Link();
+            Websockets.Droid.WebsocketConnection{Your Platform}.Link();
+        }
+        
+        
         void Connect()
         {
+            // 2) Get a websocket from your PCL library via the factory
             connection = Websockets.WebSocketFactory.Create();
             connection.OnOpened += Connection_OnOpened;
             connection.OnMessage += Connection_OnMessage;
