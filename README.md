@@ -31,6 +31,14 @@ Coming Soon
 - Include the Websockets (PCL) library in the main common app
 - Include the platform specific stuff in the platform projects (Like Above)
 
+**.Net Core (MVC, Console, ect)**
+- Include Websockets.Net and Websockets  (PCL) library
+
+- **Windows 10 Universal**
+- Include Websockets.Universal and Websockets  (PCL) library
+
+- **Windows 8 Phone**
+- Cry (to me)
 
 
 ### Usage
