@@ -1,11 +1,21 @@
 ## WebSocket.Portable
 
-WebSocket.Portable is a PCL Profile 259 C# implementation of the [WebSocket protocol](https://tools.ietf.org/html/rfc6455). This plugin uses .net 4.5 and is compatible Xamarin Android, and Xamarin iOS.
+WebSocket.Portable is a PCL Profile 259 C# implementation of the [WebSocket protocol](https://tools.ietf.org/html/rfc6455).
 
 This project is a binding library that makes use of native (Java / Objective-C) websockets to get around the limitations and jank of mono based websockets.
 
+
+### Platforms
+
+- Xamarin Android
+- Xamarin iOS
+- Windows Universal
+- .Net Core 
+- PCL (By way of factory, see demo)
+
+
 ### NuGet
-https://www.nuget.org/packages/WebSocket.PCL/
+Coming Soon
 
 ### Usage
 

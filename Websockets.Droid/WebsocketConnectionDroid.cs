@@ -1,6 +1,4 @@
 using System;
-using Android.App;
-using Android.OS;
 using Websockets.DroidBridge;
 
 namespace Websockets.Droid
@@ -19,8 +17,12 @@ namespace Websockets.Droid
         public event Action<string> OnLog = delegate { };
 
         private readonly BridgeController _controller;
-       private Handler handler;
 
+        static WebsocketConnectionDroid()
+        {
+            System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+        }
+        
         /// <summary>
         /// Factory Initializer
         /// </summary>
