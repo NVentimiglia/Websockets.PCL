@@ -6,7 +6,7 @@ namespace Websockets.Droid
     /// <summary>
     /// A Websocket connection via androidBridge application
     /// </summary>
-    public class WebsocketConnectionDroid : BridgeProxy, IWebSocketConnection
+    public class WebsocketConnection : BridgeProxy, IWebSocketConnection
     {
         public bool IsOpen { get; private set; }
 
@@ -18,7 +18,7 @@ namespace Websockets.Droid
 
         private readonly BridgeController _controller;
 
-        static WebsocketConnectionDroid()
+        static WebsocketConnection()
         {
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
         }
@@ -28,10 +28,10 @@ namespace Websockets.Droid
         /// </summary>
         public static void Link()
         {
-            WebSocketFactory.Init(() => new WebsocketConnectionDroid());
+            WebSocketFactory.Init(() => new WebsocketConnection());
         }
 
-        public WebsocketConnectionDroid()
+        public WebsocketConnection()
         {
             _controller = new BridgeController();
             _controller.Proxy = this;

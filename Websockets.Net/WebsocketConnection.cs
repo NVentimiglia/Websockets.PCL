@@ -1,13 +1,11 @@
 using System;
-using System.Threading.Tasks;
-using Websockets.Net;
 
-namespace Websockets.Droid
+namespace Websockets.Net
 {
     /// <summary>
     /// A Websocket connection for 'full' .Net Core applications
     /// </summary>
-    public class WebsocketConnectionNet : IWebSocketConnection
+    public class WebsocketConnection : IWebSocketConnection
     {
         public bool IsOpen { get; private set; }
 
@@ -17,7 +15,7 @@ namespace Websockets.Droid
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
 
-        static WebsocketConnectionNet()
+        static WebsocketConnection()
         {
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
         }
@@ -27,7 +25,7 @@ namespace Websockets.Droid
         /// </summary>
         public static void Link()
         {
-            WebSocketFactory.Init(() => new WebsocketConnectionNet());
+            WebSocketFactory.Init(() => new WebsocketConnection());
         }
 
         private WebSocketWrapper _websocket = null;
@@ -44,6 +42,11 @@ namespace Websockets.Droid
                 _websocket.Opened += _websocket_Opened;
                 _websocket.Error += _websocket_Error;
                 _websocket.MessageReceived += _websocket_MessageReceived;
+
+                if (url.StartsWith("https"))
+                    url = url.Replace("https://", "wss://");
+                else if (url.StartsWith("http"))
+                    url = url.Replace("http://", "ws://");
 
                 await _websocket.Connect(url);
 

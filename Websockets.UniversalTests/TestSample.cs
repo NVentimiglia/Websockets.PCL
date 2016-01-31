@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 
-namespace Websockets.IosTests
+namespace Websockets.UniversalTests
 {
     public class TestsSample
     {
@@ -14,7 +14,7 @@ namespace Websockets.IosTests
         public void Setup()
         {
             // 1) Link in your main activity
-            Websockets.Ios.WebsocketConnection.Link();
+            Websockets.Universal.WebsocketConnection.Link();
         }
 
         
@@ -35,7 +35,7 @@ namespace Websockets.IosTests
 
             //Do test
 
-            Console.WriteLine("Connecting...");
+            Debug.WriteLine("Connecting...");
             connection.Open("http://echo.websocket.org");
 
             while (!connection.IsOpen && !Failed)
@@ -45,12 +45,12 @@ namespace Websockets.IosTests
 
             if (!connection.IsOpen)
                 return;
-            Console.WriteLine("Connected !");
+            Debug.WriteLine("Connected !");
 
-            System.Diagnostics.Trace.WriteLine("HI");
-            Console.WriteLine("Sending...");
+            Debug.WriteLine("HI");
+            Debug.WriteLine("Sending...");
             connection.Send("Hello World");
-            Console.WriteLine("Sent !");
+            Debug.WriteLine("Sent !");
 
             while (!Echo && !Failed)
             {
@@ -60,9 +60,9 @@ namespace Websockets.IosTests
             if (!Echo)
                 return;
 
-            Console.WriteLine("Received !");
+            Debug.WriteLine("Received !");
 
-            Console.WriteLine("Passed !");
+            Debug.WriteLine("Passed !");
         }
 
         private void Connection_OnOpened()
@@ -84,13 +84,13 @@ namespace Websockets.IosTests
 
         private void Connection_OnError(string obj)
         {
-            Trace.Write("ERROR " + obj);
+            Debug.Write("ERROR " + obj);
             Failed = true;
         }
 
         private void Connection_OnLog(string obj)
         {
-            Trace.Write(obj);
+            Debug.Write(obj);
         }
     }
 }

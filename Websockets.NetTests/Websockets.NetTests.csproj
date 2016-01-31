@@ -4,15 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{61331F41-683A-4A68-AD09-368ADBA677B7}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{771640E7-025F-4B91-A4FA-C344B1165D6C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Websockets.Net</RootNamespace>
-    <AssemblyName>Websockets.Net</AssemblyName>
+    <RootNamespace>Websockets.NetTests</RootNamespace>
+    <AssemblyName>Websockets.NetTests</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -40,12 +43,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncLock.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebsocketConnection.cs" />
-    <Compile Include="WebSocketWrapper.cs" />
+    <Compile Include="TestSample.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Websockets.Net\Websockets.Net.csproj">
+      <Project>{61331f41-683a-4a68-ad09-368adba677b7}</Project>
+      <Name>Websockets.Net</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Websockets\Websockets.csproj">
       <Project>{1a23d79e-7a64-450c-960c-4848b0149e3d}</Project>
       <Name>Websockets</Name>

@@ -18,6 +18,21 @@ This project is a binding library that makes use of native (Java / Objective-C) 
 ### NuGet
 Coming Soon
 
+### Setup
+
+**Android**
+- Include Websockets.Droid and Websockets  (PCL) library
+
+**Ios**
+- Include Websockets.Ios and Websockets  (PCL) library
+- Include Square.SocketRocket
+
+**Xamarin Forms**
+- Include the Websockets (PCL) library in the main common app
+- Include the platform specific stuff in the platform projects (Like Above)
+
+
+
 ### Usage
 
 `````
@@ -25,9 +40,7 @@ Coming Soon
         {
             // Call in your platform (non-pcl) startup            
             // 1) Link in your main activity or AppDelegate or whatever
-            Websockets.Droid.WebsocketConnectionDroid.Link();
-            Websockets.Droid.WebsocketConnectionIos.Link();
-            Websockets.Droid.WebsocketConnection{Your Platform}.Link();
+            Websockets.Droid.WebsocketConnection.Link();
         }
         
         

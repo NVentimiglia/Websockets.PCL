@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebsocketConnectionIos.cs" />
+    <Compile Include="WebsocketConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

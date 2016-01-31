@@ -6,7 +6,7 @@ using Square.SocketRocket;
 namespace Websockets.Ios
 {
     [Preserve]
-    public class WebsocketConnectionIos : IWebSocketConnection
+    public class WebsocketConnection : IWebSocketConnection
     {
         public bool IsOpen { get; private set; }
 
@@ -16,7 +16,7 @@ namespace Websockets.Ios
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
 
-        static WebsocketConnectionIos()
+        static WebsocketConnection()
         {
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
         }
@@ -26,7 +26,7 @@ namespace Websockets.Ios
         /// </summary>
         public static void Link()
         {
-            WebSocketFactory.Init(() => new WebsocketConnectionIos());
+            WebSocketFactory.Init(() => new WebsocketConnection());
         }
         
         private WebSocket _client = null;

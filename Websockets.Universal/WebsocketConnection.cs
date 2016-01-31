@@ -8,7 +8,7 @@ namespace Websockets.Universal
     /// <summary>
     /// A Websocket connection for Universal
     /// </summary>
-    public class WebsocketConnectionUniversal : IWebSocketConnection
+    public class WebsocketConnection : IWebSocketConnection
     {
         public bool IsOpen { get; private set; }
 
@@ -17,13 +17,13 @@ namespace Websockets.Universal
         public event Action<string> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
-        
+
         /// <summary>
         /// Factory Initializer
         /// </summary>
         public static void Link()
         {
-            WebSocketFactory.Init(() => new WebsocketConnectionUniversal());
+            WebSocketFactory.Init(() => new WebsocketConnection());
         }
 
         private MessageWebSocket _websocket;
@@ -40,6 +40,11 @@ namespace Websockets.Universal
                 _websocket.Control.MessageType = SocketMessageType.Utf8;
                 _websocket.Closed += _websocket_Closed;
                 _websocket.MessageReceived += _websocket_MessageReceived;
+
+                if (url.StartsWith("https"))
+                    url = url.Replace("https://", "wss://");
+                else if (url.StartsWith("http"))
+                    url = url.Replace("http://", "ws://");
 
                 _websocket.ConnectAsync(new Uri(url)).Completed = (source, status) =>
                 {

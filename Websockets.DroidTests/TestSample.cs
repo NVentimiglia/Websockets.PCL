@@ -17,17 +17,15 @@ namespace Websockets.DroidTests
         public void Setup()
         {
             // 1) Link in your main activity
-            Websockets.Droid.WebsocketConnectionDroid.Link();
+            Websockets.Droid.WebsocketConnection.Link();
         }
 
 
         [Test]
         public async void DoTest()
         {
-            //NOTE Does not work in emulator
-
             // 2) Call factory from your PCL code.
-            // This is the same as new   Websockets.Droid.WebsocketConnectionDroid();
+            // This is the same as new   Websockets.Droid.WebsocketConnection();
             // Except that the Factory is in a PCL and accessible anywhere
             connection = Websockets.WebSocketFactory.Create();
             connection.OnLog += Connection_OnLog;

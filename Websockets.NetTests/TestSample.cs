@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 
 
-namespace Websockets.IosTests
+namespace Websockets.NetTests
 {
     public class TestsSample
     {
@@ -14,7 +14,7 @@ namespace Websockets.IosTests
         public void Setup()
         {
             // 1) Link in your main activity
-            Websockets.Ios.WebsocketConnection.Link();
+            Websockets.Net.WebsocketConnection.Link();
         }
 
         
