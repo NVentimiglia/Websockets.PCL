@@ -79,7 +79,7 @@ Coming Soon
 
 ### Example
 
-There is a XamarinApp.Droid example in the /Examples/ folder.
+There are a few 'test' examples (projects with the Tests suffix). Take a look there. The relivent code is in a standalone test file.
 
 ### TODO
 
