@@ -1,17 +1,20 @@
 ## WebSocket.Portable
 
-WebSocket.Portable is a PCL Profile 259 C# implementation of the [WebSocket protocol](https://tools.ietf.org/html/rfc6455).
-
+WebSocket.Portable is a PCL Profile 259 C# implementation of the WebSocket protocol.
 
 The motivation for this project was three part :
 
-1) Having a completly differnt websocket implementation on every platform is a pain.
+1) Having a completely different websocket implementation on every platform is a pain.
 
-2) OkHttp.Ws Crashes with a fatall signal 11 if you loose internet
+2) OkHttp.Ws Crashes with a fatal signal 11 if you loose internet
 
 3) My original Mono implementation did not support TLS or SSL
 
-This project is a binding library that makes use of native websockets to get around the limitations and jank of mono based websockets. On IOS I use SocketRocket because it works fine. On Android I wrote a custom binding library in Java and use AndroidAsync. On the WP8 we wrap around Websockets4Net. On the other platforms we wrapp the default MSDN implementation. *Really* the most valuable part is the android implementation... but why not unify ?
+This project is a binding library that makes use of native websockets to get around the limitations and jank of mono based websockets. On IOS I use SocketRocket because it works fine. On Android I wrote a custom binding library in Java and use AndroidAsync. On the WP8 we wrap around Websockets4Net. On the other platforms we wrap the default MSDN implementation. Really the most valuable part is the android implementation... but why not unify ?
+
+https://github.com/NVentimiglia/Websockets.PCL/blob/master/README.md
+
+https://www.nuget.org/packages/Websockets.Pcl/
 
 ### Platforms
 
