@@ -34,10 +34,10 @@ Coming Soon
 **.Net Core (MVC, Console, ect)**
 - Include Websockets.Net and Websockets  (PCL) library
 
-- **Windows 10 Universal**
+**Windows 10 Universal**
 - Include Websockets.Universal and Websockets  (PCL) library
 
-- **Windows 8 Phone**
+**Windows 8 Phone**
 - Cry (to me)
 
 
