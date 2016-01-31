@@ -105,6 +105,7 @@ namespace Websockets.Ios
 
         private void _client_WebSocketOpened(object sender, EventArgs e)
         {
+			IsOpen = true;
             OnOpened();
         }
 
@@ -120,7 +121,8 @@ namespace Websockets.Ios
         }
 
         private void _client_WebSocketClosed(object sender, WebSocketClosedEventArgs e)
-        {
+		{
+			IsOpen = false;
             OnClosed();
         }
 

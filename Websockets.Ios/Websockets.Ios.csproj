@@ -2,9 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DD8C01F3-188F-40E5-B8B1-62DB48C1847F}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
@@ -41,18 +39,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Square.SocketRocket, Version=0.4.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Square.SocketRocket.0.4.2.0\lib\Xamarin.iOS\Square.SocketRocket.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="Square.SocketRocket, Version=0.4.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Square.SocketRocket.0.4.2.0\lib\Xamarin.iOS\Square.SocketRocket.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Websockets\Websockets.csproj">
-      <Project>{1a23d79e-7a64-450c-960c-4848b0149e3d}</Project>
+      <Project>{1A23D79E-7A64-450C-960C-4848B0149E3D}</Project>
       <Name>Websockets</Name>
     </ProjectReference>
   </ItemGroup>

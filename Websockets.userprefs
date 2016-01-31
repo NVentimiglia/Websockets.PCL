@@ -1,0 +1,41 @@
+﻿<Properties StartupItem="Websockets.IosTests/Websockets.IosTests.csproj">
+  <DisabledProjects>
+    <String>Websockets.Universal/Websockets.Universal.csproj</String>
+    <String>Websockets.Net/Websockets.Net.csproj</String>
+    <String>Websockets.Droid/Websockets.Droid.csproj</String>
+    <String>Websockets.DroidTests/Websockets.DroidTests.csproj</String>
+    <String>Websockets.IosTests/Websockets.IosTests.csproj</String>
+  </DisabledProjects>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="AppStore|iPhone" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Websockets.Ios/WebsocketConnectionIos.cs">
+    <Files>
+      <File FileName="Websockets.Ios/WebsocketConnectionIos.cs" Line="47" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests/TestSample.cs" line="32" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests/TestSample.cs" line="20" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests/TestSample.cs" line="73" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests/TestSample.cs" line="69" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests/TestSample.cs" line="61" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="20" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="32" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="45" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="52" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="90" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="95" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="101" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="107" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="78" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.IosTests2/TestSample.cs" line="69" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="108" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="124" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="129" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="42" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="47" column="1" />
+      <Breakpoint file="/Users/nventimiglia/Desktop/Websockets.PCL/Websockets.Ios/WebsocketConnectionIos.cs" line="56" column="1" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
