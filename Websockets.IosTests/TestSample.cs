@@ -1,27 +1,23 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using NUnit.Framework;
 
 
 namespace Websockets.IosTests
 {
-    [TestFixture]
     public class TestsSample
     {
         private Websockets.IWebSocketConnection connection;
         private bool Failed;
         private bool Echo;
-
-        [SetUp]
+        
         public void Setup()
         {
-            // 1) Link in app startup
+            // 1) Link in your main activity
             Websockets.Ios.WebsocketConnectionIos.Link();
         }
 
-
-        [Test]
+        
         public async void DoTest()
         {
             //NOTE Does not work in emulator
@@ -69,8 +65,6 @@ namespace Websockets.IosTests
             Console.WriteLine("Received !");
 
             Console.WriteLine("Passed !");
-
-            Assert.True(true);
         }
 
         private void Connection_OnOpened()
@@ -99,15 +93,6 @@ namespace Websockets.IosTests
         private void Connection_OnLog(string obj)
         {
             Trace.Write(obj);
-        }
-
-        [TearDown]
-        public void Tear()
-        {
-            if (connection != null)
-            {
-                connection.Dispose();
-            }
         }
     }
 }
