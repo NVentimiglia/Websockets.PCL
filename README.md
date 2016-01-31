@@ -9,6 +9,7 @@ This project is a binding library that makes use of native (Java / Objective-C) 
 
 - Android
 - iOS
+- WP8
 - Universal
 - Xamarin
 - .Net Core 
@@ -21,10 +22,10 @@ Coming Soon
 ### Setup
 
 **Android**
-- Include Websockets.Droid and Websockets  (PCL) library
+- Include Websockets.Droid and Websockets (PCL) library
 
 **Ios**
-- Include Websockets.Ios and Websockets  (PCL) library
+- Include Websockets.Ios and Websockets (PCL) library
 - Include Square.SocketRocket
 
 **Xamarin Forms**
@@ -32,13 +33,14 @@ Coming Soon
 - Include the platform specific stuff in the platform projects (Like Above)
 
 **.Net Core (MVC, Console, ect)**
-- Include Websockets.Net and Websockets  (PCL) library
+- Include Websockets.Net and Websockets (PCL) library
 
 **Windows 10 Universal**
-- Include Websockets.Universal and Websockets  (PCL) library
+- Include Websockets.Universal and Websockets (PCL) library
 
 **Windows 8 Phone**
-- Cry (to me)
+- Include Websockets.WP8 and Websockets (PCL) library
+- Include Websockets4Net
 
 
 ### Usage
