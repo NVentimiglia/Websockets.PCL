@@ -7,11 +7,12 @@ This project is a binding library that makes use of native (Java / Objective-C) 
 
 ### Platforms
 
-- Xamarin Android
-- Xamarin iOS
-- Windows Universal
+- Android
+- iOS
+- Universal
+- Xamarin
 - .Net Core 
-- PCL (By way of factory, see demo)
+- PCL
 
 
 ### NuGet
