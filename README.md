@@ -8,7 +8,7 @@ The motivation for this project was three part :
 
 2) OkHttp.Ws Crashes with a fatal signal 11 if you loose internet
 
-3) My original Mono implementation did not support TLS or SSL
+3) My original Mono implementation could not support TLS or SSL (Because Mono is janky)
 
 This project is a binding library that makes use of native websockets to get around the limitations and jank of mono based websockets. On IOS I use SocketRocket because it works fine. On Android I wrote a custom binding library in Java and use AndroidAsync. On the WP8 we wrap around Websockets4Net. On the other platforms we wrap the default MSDN implementation. Really the most valuable part is the android implementation... but why not unify ?
 
