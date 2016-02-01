@@ -1,6 +1,6 @@
-## WebSocket.Portable
+## WebSockets.Pcl
 
-WebSocket.Portable is a PCL Profile 259 C# implementation of the WebSocket protocol.
+WebSockets.PCL is a portable class library, profile 259, C# WebSocket implementation.
 
 The motivation for this project was three part :
 
