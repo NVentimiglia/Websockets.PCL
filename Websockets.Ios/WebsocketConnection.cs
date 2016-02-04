@@ -31,7 +31,6 @@ namespace Websockets.Ios
         
         private WebSocket _client = null;
 
-
         public void Open(string url, string protocol = null)
         {
             try
@@ -91,7 +90,14 @@ namespace Websockets.Ios
 
         public void Send(string message)
         {
-            _client.Send(new NSString(message));
+            try
+            {
+                _client.Send(new NSString(message));
+            }
+            catch (Exception ex)
+            {
+                OnError(ex.Message);
+            }
         }
 
         public void Dispose()

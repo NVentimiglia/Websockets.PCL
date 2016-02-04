@@ -16,7 +16,7 @@ namespace Websockets.Droid
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
 
-        private readonly BridgeController _controller;
+        private BridgeController _controller;
 
         static WebsocketConnection()
         {
@@ -31,13 +31,6 @@ namespace Websockets.Droid
             WebSocketFactory.Init(() => new WebsocketConnection());
         }
 
-        public WebsocketConnection()
-        {
-            _controller = new BridgeController();
-            _controller.Proxy = this;
-        }
-
-
         public void Close()
         {
             IsOpen = false;
@@ -46,21 +39,45 @@ namespace Websockets.Droid
 
         public void Open(string url, string protocol = null)
         {
-            _controller.Proxy = this;
-            _controller.Proxy = this;
-            _controller.Open(url, protocol);
+            try
+            {
+                _controller = new BridgeController();
+                _controller.Proxy = this;
+                _controller.Proxy = this;
+                _controller.Proxy = this;
+                _controller.Open(url, protocol);
+            }
+            catch (Exception ex)
+            {
+                OnError(ex.Message);
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
-            Close();
-            base.Dispose(disposing);
+            try
+            {
+                Close();
+                base.Dispose(disposing);
+            }
+            catch (Exception ex)
+            {
+                OnError(ex.Message);
+            }
         }
 
 
         public void Send(string message)
         {
-            _controller.Send(message);
+            try
+            {
+                _controller.Send(message);
+
+            }
+            catch (Exception ex)
+            {
+                OnError(ex.Message);
+            }
         }
 
         //
