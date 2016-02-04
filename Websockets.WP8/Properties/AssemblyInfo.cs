@@ -9,9 +9,9 @@ using System.Resources;
 [assembly: AssemblyTitle("Websockets.WP8")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Websockets.WP8")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyCompany("Nicholas Ventimiglia")]
+[assembly: AssemblyProduct("Websockets.Pcl")]
+[assembly: AssemblyCopyright("Copyright © 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
