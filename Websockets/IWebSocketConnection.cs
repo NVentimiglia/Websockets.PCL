@@ -22,7 +22,7 @@ namespace Websockets
         event Action<string> OnError;
 
         event Action<string> OnMessage;
-
+        
         event Action<string> OnLog;
     }
 }

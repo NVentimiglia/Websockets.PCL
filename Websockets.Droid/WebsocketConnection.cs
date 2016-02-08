@@ -14,6 +14,7 @@ namespace Websockets.Droid
         public event Action OnOpened = delegate { };
         public event Action<string> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
+        public event Action<byte[]> OnData = delegate { };
         public event Action<string> OnLog = delegate { };
 
         private BridgeController _controller;
