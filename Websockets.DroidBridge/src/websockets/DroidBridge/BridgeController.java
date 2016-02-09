@@ -12,16 +12,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import websockets.Websocket.WebSocket;
-import websockets.Websocket.WebSocketEventHandler;
-import websockets.Websocket.WebSocketException;
-import websockets.Websocket.WebSocketMessage;
+//https://github.com/koush/AndroidAsync
+import com.koushikdutta.async.callback.CompletedCallback;
+import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.WebSocket;
 
-import javax.net.ssl.SSLContext;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 
 public class BridgeController {
 
@@ -42,115 +37,66 @@ public class BridgeController {
     public void Open(final String wsuri, final String protocol) {
         Log("BridgeController:Open");
 
-        Thread thread = new Thread(new Runnable(){
+        AsyncHttpClient.getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
+                .WebSocketConnectCallback()
+        {
             @Override
-            public void run() {
-                try {
-                    URI connectionUri = new URI(wsuri);
-                    if(protocol == null || protocol.isEmpty())
-                        mConnection = new WebSocket(connectionUri);
-                    else
-                        mConnection = new WebSocket(connectionUri, protocol);
-                    addSocketEventsListener();
-                    mConnection.connect();
-                } catch (WebSocketException e) {
-                    Error("BridgeController:Open:Exception "+ e.getMessage());
-                    Error(e.getMessage());
-                } catch (URISyntaxException e) {
-                    Error("BridgeController:Open:Exception "+ e.getMessage()+" "+e.getReason());
+            public void onCompleted(Exception ex, WebSocket webSocket)
+            {
+                if (ex != null)
+                {
+                    Error(ex.toString());
+                    return;
                 }
+
+                mConnection = webSocket;
+                RaiseOpened();
+
+                webSocket.setClosedCallback(new CompletedCallback()
+                {
+                    @Override
+                    public void onCompleted(Exception e)
+                    {
+                        mConnection = null;
+                        RaiseClosed();
+                    }
+                });
+
+
+                webSocket.setStringCallback(new WebSocket.StringCallback()
+                {
+                    public void onStringAvailable(final String s)
+                    {
+                        RaiseMessage(s);
+                    }
+                });
             }
         });
-
-        thread.start();
     }
 
     public void Close() {
 
-        Thread thread = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                if(mConnection == null)
-                    return;
-                try {
-                    mConnection.close(true);
-                } catch (Exception ex) {
-                    Error("BridgeController:Close:Exception");
-                    Error(ex.getMessage());
-                }
-            }
-        });
+        try
+        {
+            if(mConnection == null)
+                return;
+            mConnection.close();
 
-        thread.start();
-
-
+        }catch (Exception ex){
+            RaiseError("Error Close - "+ex.getMessage());
+        }
     }
 
     // send a message
     public void Send(final String message) {
-        Thread thread = new Thread(new Runnable(){
-            @Override
-            public void run() {
-                if(mConnection == null)
-                    return;
-                try {
-                    mConnection.send(message);
-                } catch (Exception ex) {
-                    Error("BridgeController:Send:Exception");
-                    Error(ex.getMessage());
-                }
-            }
-        });
-
-        thread.start();
-
-    }
-
-
-    private void addSocketEventsListener() {
-        mConnection.setEventHandler(new WebSocketEventHandler() {
-
-            @Override
-            public void onOpen() {
-                RaiseOpened();
-            }
-
-            @Override
-            public void onMessage(WebSocketMessage socketMessage) {
-                try {
-                    RaiseMessage(socketMessage.getText());
-                } catch (Exception e) {
-                    RaiseError(e.getMessage());
-                }
-            }
-
-            @Override
-            public void onClose() {
-                RaiseClosed();
-                mConnection = null;
-            }
-
-            @Override
-            public void onForcedClose() {
-                RaiseClosed();
-                mConnection = null;
-            }
-
-            @Override
-            public void onPing() {
-
-            }
-
-            @Override
-            public void onPong() {
-
-            }
-
-            @Override
-            public void onException(Exception error) {
-                RaiseError(error.getMessage());
-            }
-        });
+        try
+        {
+            if(mConnection == null)
+                return;
+            mConnection.send(message);
+        }catch (Exception ex){
+            RaiseError("Error Send - "+ex.getMessage());
+        }
     }
 
     private void Log(final String args) {

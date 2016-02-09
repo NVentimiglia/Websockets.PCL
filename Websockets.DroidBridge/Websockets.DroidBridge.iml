@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="library" exported="" name="android" level="project" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="androidasync-2.1.6" level="project" />
   </component>
 </module>
