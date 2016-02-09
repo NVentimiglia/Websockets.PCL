@@ -17,6 +17,11 @@ import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.WebSocket;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
+
 
 public class BridgeController {
 
@@ -36,6 +41,26 @@ public class BridgeController {
     // connect websocket
     public void Open(final String wsuri, final String protocol) {
         Log("BridgeController:Open");
+
+        AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
+                new X509TrustManager() {
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
+                }
+        });
+
+        SSLContext sslContext = null;
+
+        try {
+            sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, null, null);
+
+            AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setSSLContext(sslContext);
+        } catch (Exception e){
+            Log.d("SSLCONFIG", e.toString(), e);
+        }
+
 
         AsyncHttpClient.getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
                 .WebSocketConnectCallback()
