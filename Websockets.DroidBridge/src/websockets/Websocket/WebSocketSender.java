@@ -14,45 +14,45 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebSocketSender {
 
-	private static class Sender implements Runnable {
-		private WebSocket connection;
-		private PrintStream output;
+    private static class Sender implements Runnable {
+        private WebSocket connection;
+        private PrintStream output;
         private final Random random = new SecureRandom();
-		
-		public Queue<Object> q = new LinkedBlockingQueue<Object>();
-				
-		public Sender send(byte opcode, boolean masking, byte[] data){
-			q.add(data);
+
+        public Queue<Object> q = new LinkedBlockingQueue<Object>();
+
+        public Sender send(byte opcode, boolean masking, byte[] data){
+            q.add(data);
             q.add(opcode);
             q.add(masking);
-			return this;
-		}
-		
-		public Sender(PrintStream output, WebSocket connection) {
-			this.connection = connection;
-			this.output = output;
-		}
-		
-		public void run() {
-			if(q.size() > 0) {
-				byte[] data = (byte[]) q.poll();
+            return this;
+        }
+
+        public Sender(PrintStream output, WebSocket connection) {
+            this.connection = connection;
+            this.output = output;
+        }
+
+        public void run() {
+            if(q.size() > 0) {
+                byte[] data = (byte[]) q.poll();
                 byte opcode = (byte) q.poll();
                 boolean masking = (boolean) q.poll();
-				try {
-					sendAsync(opcode,masking,data);
-				} catch (WebSocketException e) {
-					
-				}
-			}
-		}
-		
-		private void sendAsync(byte opcode, boolean masking, byte[] data) throws WebSocketException{
-			if (!connection.isConnected()) {
-				throw new WebSocketException(
-						"error while sending text data: not connected");
-			}
-			
-			try {
+                try {
+                    sendAsync(opcode,masking,data);
+                } catch (WebSocketException e) {
+
+                }
+            }
+        }
+
+        private void sendAsync(byte opcode, boolean masking, byte[] data) throws WebSocketException{
+            if (!connection.isConnected()) {
+                throw new WebSocketException(
+                        "error while sending text data: not connected");
+            }
+
+            try {
                 int headerLength = 2; // This is just an assumed headerLength, as we use a ByteArrayOutputStream
                 if (masking) {
                     headerLength += 4;
@@ -103,12 +103,12 @@ public class WebSocketSender {
                 frame.write(data);
                 output.write(frame.toByteArray());
                 output.flush();
-			} catch (UnsupportedEncodingException uee) {
-				throw new WebSocketException("error while sending text data: unsupported encoding", uee);
-			} catch (IOException ioe) {
-				throw new WebSocketException("error while sending text data", ioe);
-			}
-		}
+            } catch (UnsupportedEncodingException uee) {
+                throw new WebSocketException("error while sending text data: unsupported encoding", uee);
+            } catch (IOException ioe) {
+                throw new WebSocketException("error while sending text data", ioe);
+            }
+        }
 
         private byte[] generateMask()
         {
@@ -122,27 +122,27 @@ public class WebSocketSender {
             byte[] bytes = ByteBuffer.allocate(4).putInt(number).array();
             return bytes;
         }
-	}
-	
-	private Sender sender;
-	private ExecutorService exec;
-	
-	public WebSocketSender(PrintStream output, WebSocket connection)  {
-		exec = Executors.newSingleThreadExecutor();
-		sender = new Sender(output, connection);
-	}	
-	
-	@Override
-	protected void finalize() throws Throwable {		
-		super.finalize();
-		if(exec != null && !exec.isShutdown() && !exec.isTerminated()){
-			exec.shutdown();
-		}
-	}
-	
-	public void send(byte opcode, boolean masking, byte[] data) throws WebSocketException {
-		if(exec != null && !exec.isShutdown() && !exec.isTerminated() && sender != null && data != null){
-			exec.execute(sender.send(opcode, masking, data));
-		}
-	}
+    }
+
+    private Sender sender;
+    private ExecutorService exec;
+
+    public WebSocketSender(PrintStream output, WebSocket connection)  {
+        exec = Executors.newSingleThreadExecutor();
+        sender = new Sender(output, connection);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if(exec != null && !exec.isShutdown() && !exec.isTerminated()){
+            exec.shutdown();
+        }
+    }
+
+    public void send(byte opcode, boolean masking, byte[] data) throws WebSocketException {
+        if(exec != null && !exec.isShutdown() && !exec.isTerminated() && sender != null && data != null){
+            exec.execute(sender.send(opcode, masking, data));
+        }
+    }
 }

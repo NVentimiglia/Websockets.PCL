@@ -59,6 +59,9 @@ public class BridgeController {
                 } catch (URISyntaxException e) {
                     Error("BridgeController:Open:Exception "+ e.getMessage()+" "+e.getReason());
                 }
+                catch (Exception e){
+                    Error("BridgeController:Open:Exception "+ e.getMessage());
+                }
             }
         });
 

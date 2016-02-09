@@ -30,7 +30,7 @@ public class WebSocketReceiver extends Thread
 
 	private volatile boolean stop = false;
 
-	
+
 	public WebSocketReceiver(DataInputStream input, WebSocket websocket)
 	{
 		this.input = input;
