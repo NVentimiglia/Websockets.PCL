@@ -291,21 +291,10 @@ public class WebSocket
 			if (port == -1) {
 				port = 80;
 			}
-			try {
-				socket = new Socket(host, port);
-                socket.setKeepAlive(true);
-                socket.setSoTimeout(0);
-			} catch (UnknownHostException uhe) {
-				throw new WebSocketException("unknown host: " + host, uhe);
-			} catch (IOException ioe) {
-				throw new WebSocketException("error while creating socket to " + url, ioe);
-			}
 		} else if (scheme != null && scheme.equals("wss")) {
 			if (port == -1) {
 				port = 443;
 			}
-
-
 
 			try {
 				SocketFactory factory = SSLSocketFactory.getDefault();
