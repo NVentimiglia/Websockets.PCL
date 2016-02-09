@@ -16,7 +16,6 @@ bld/
 [Bb]in/
 [Oo]bj/
 packages/
-src/
 out/
 
 # Roslyn cache directories
