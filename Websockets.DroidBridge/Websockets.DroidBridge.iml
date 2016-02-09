@@ -8,6 +8,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="library" exported="" name="android" level="project" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="androidasync-2.1.6" level="project" />
+    <orderEntry type="library" name="okhttp-2.7.4" level="project" />
+    <orderEntry type="library" name="okhttp-ws-2.7.4" level="project" />
+    <orderEntry type="library" name="okio-1.6.0" level="project" />
   </component>
 </module>

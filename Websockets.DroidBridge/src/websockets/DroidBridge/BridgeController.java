@@ -12,15 +12,15 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-//https://github.com/koush/AndroidAsync
-import com.koushikdutta.async.callback.CompletedCallback;
-import com.koushikdutta.async.http.AsyncHttpClient;
-import com.koushikdutta.async.http.WebSocket;
+import com.squareup.okhttp.*;
+import com.squareup.okhttp.ws.WebSocket;
+import com.squareup.okhttp.ws.WebSocketCall;
+import com.squareup.okhttp.ws.WebSocketListener;
+import okio.Buffer;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.cert.X509Certificate;
+import java.io.IOException;
+
+import static com.squareup.okhttp.ws.WebSocket.TEXT;
 
 
 public class BridgeController {
@@ -42,61 +42,60 @@ public class BridgeController {
     public void Open(final String wsuri, final String protocol) {
         Log("BridgeController:Open");
 
-        AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
-                new X509TrustManager() {
-                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
-                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
-                }
-        });
-
-        SSLContext sslContext = null;
-
         try {
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, null, null);
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder()
+                    .url(wsuri)
+                    .build();
+            WebSocketCall call = WebSocketCall.create(client, request);
+            call.enqueue(new WebSocketListener() {
+                @Override
+                public void onOpen(WebSocket webSocket, Response response) {
+                    RaiseOpened();
+                    mConnection = webSocket;
+                }
 
-            AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setSSLContext(sslContext);
-        } catch (Exception e){
-            Log.d("SSLCONFIG", e.toString(), e);
+                @Override
+                public void onFailure(IOException e, Response response) {
+                    RaiseError(e.getMessage());
+                    RaiseClosed();
+                    mConnection = null;
+                }
+
+
+                @Override
+                public void onMessage(ResponseBody payload) throws IOException {
+                 try
+                 {
+                     String mahString = payload.string();
+                     payload.close();
+                     RaiseMessage(mahString);
+
+                 }catch (Exception ex){
+                     RaiseError("Error onMessage - "+ex.getMessage());
+                 }
+                }
+
+                @Override
+                public void onPong(okio.Buffer buffer) {
+
+                }
+
+
+                @Override
+                public void onClose(int i, String s) {
+                    RaiseClosed();
+                    mConnection = null;
+                }
+            });
+
+            // Trigger shutdown of the dispatcher's executor so this process can exit cleanly.
+            client.getDispatcher().getExecutorService().shutdown();
+
+        }catch (Exception ex){
+            Error("Open "+ex.getMessage());
         }
 
-
-        AsyncHttpClient.getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
-                .WebSocketConnectCallback()
-        {
-            @Override
-            public void onCompleted(Exception ex, WebSocket webSocket)
-            {
-                if (ex != null)
-                {
-                    Error(ex.toString());
-                    return;
-                }
-
-                mConnection = webSocket;
-                RaiseOpened();
-
-                webSocket.setClosedCallback(new CompletedCallback()
-                {
-                    @Override
-                    public void onCompleted(Exception e)
-                    {
-                        mConnection = null;
-                        RaiseClosed();
-                    }
-                });
-
-
-                webSocket.setStringCallback(new WebSocket.StringCallback()
-                {
-                    public void onStringAvailable(final String s)
-                    {
-                        RaiseMessage(s);
-                    }
-                });
-            }
-        });
     }
 
     public void Close() {
@@ -105,7 +104,7 @@ public class BridgeController {
         {
             if(mConnection == null)
                 return;
-            mConnection.close();
+            mConnection.close(1000,"CLOSE_NORMAL");
 
         }catch (Exception ex){
             RaiseError("Error Close - "+ex.getMessage());
@@ -118,7 +117,10 @@ public class BridgeController {
         {
             if(mConnection == null)
                 return;
-            mConnection.send(message);
+            Log.d(TAG, message);
+            RequestBody body = RequestBody.create(TEXT, message);
+
+            mConnection.sendMessage(body);
         }catch (Exception ex){
             RaiseError("Error Send - "+ex.getMessage());
         }
@@ -126,13 +128,11 @@ public class BridgeController {
 
     private void Log(final String args) {
         Log.d(TAG, args);
-
         RaiseLog(args);
     }
 
     private void Error(final String args) {
         Log.e(TAG, args);
-
         RaiseError(String.format("Error: %s", args));
     }
 

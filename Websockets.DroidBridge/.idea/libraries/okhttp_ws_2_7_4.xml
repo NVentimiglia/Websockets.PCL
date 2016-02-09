@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="androidasync-2.1.6">
+  <library name="okhttp-ws-2.7.4">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/libs/androidasync-2.1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/okhttp-ws-2.7.4.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
