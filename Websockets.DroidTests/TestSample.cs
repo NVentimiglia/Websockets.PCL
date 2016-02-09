@@ -40,7 +40,7 @@ namespace Websockets.DroidTests
             //Do test
 
             Console.WriteLine("Connecting...");
-            connection.Open("http://echo.websocket.org");
+            connection.Open("ws://echo.websocket.org?encoding=text");
 
             while (!connection.IsOpen && !Failed)
             {
