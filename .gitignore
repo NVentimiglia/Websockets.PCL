@@ -209,4 +209,3 @@ keepBackup = false
 [merge]
 tool = codecompare
 guitool = codecompare
-.nuget/

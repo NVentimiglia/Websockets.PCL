@@ -19,49 +19,48 @@ package websockets.Websocket;
 import android.util.Log;
 import static android.util.Log.DEBUG;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
+
 
 public class WebSocket
 {
-	private static final String TAG = "WebSocket";
+    private static final String TAG = "WebSocket";
 	private static final String GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 	private static final int VERSION = 13;
-
+	
 	static final byte OPCODE_TEXT = 0x1;
 	static final byte OPCODE_BINARY = 0x2;
 	static final byte OPCODE_CLOSE = 0x8;
 	static final byte OPCODE_PING = 0x9;
 	static final byte OPCODE_PONG = 0xA;
-
+	
 	private URI url = null;
 	private WebSocketEventHandler eventHandler = null;
-
+	
 	private volatile boolean connected = false;
-
+	
 	private Socket socket = null;
 	private DataInputStream input = null;
 	private PrintStream output = null;
-
+	
 	private WebSocketReceiver receiver = null;
-	private WebSocketSender sender = null;
+    private WebSocketSender sender = null;
 	private WebSocketHandshake handshake = null;
-
+	
 	private final Random random = new SecureRandom();
-
+	
 	public WebSocket(URI url)
 	{
 		this(url, null, null);
@@ -141,7 +140,7 @@ public class WebSocket
 			handshake.verifyServerHandshakeHeaders(headers);
 
 			receiver = new WebSocketReceiver(input, this);
-			sender = new WebSocketSender(output, this);
+            sender = new WebSocketSender(output, this);
 			receiver.start();
 			connected = true;
 			eventHandler.onOpen();
@@ -154,13 +153,14 @@ public class WebSocket
 
 	public synchronized void send(String data) throws WebSocketException
 	{
-		if(sender != null && data != null){
-			sender.send(OPCODE_TEXT,true,data.getBytes());
-		}
+        if(sender != null && data != null){
+            sender.send(OPCODE_TEXT,true,data.getBytes());
+        }
 
 		/*if (!connected) {
 			throw new WebSocketException("error while sending text data: not connected");
 		}
+
 		try {
 			this.sendFrame(OPCODE_TEXT, true, data.getBytes());
 		} catch (IOException e) {
@@ -175,11 +175,13 @@ public class WebSocket
 			headerLength += 4;
 		}
 		ByteArrayOutputStream frame = new ByteArrayOutputStream(data.length + headerLength);
+
 		byte fin = (byte) 0x80;
 		byte startByte = (byte) (fin | opcode);
 		frame.write(startByte);
 		int length = data.length;
 		int length_field = 0;
+
 		if (length < 126) {
 			if (masking) {
 				length = 0x80 | length;
@@ -204,14 +206,17 @@ public class WebSocket
 			frame.write(new byte[]{0x0, 0x0, 0x0, 0x0});
 			frame.write(intToByteArray(length));
 		}
+
 		byte[] mask = null;
 		if (masking) {
 			mask = generateMask();
 			frame.write(mask);
+
 			for (int i = 0; i < data.length; i++) {
 				data[i] ^= mask[i % 4];
 			}
 		}
+
 		frame.write(data);
 		output.write(frame.toByteArray());
 		output.flush();
@@ -224,40 +229,40 @@ public class WebSocket
 				close(true);
 			}
 		} catch (WebSocketException wse) {
-			if (Log.isLoggable(TAG, DEBUG))
-				Log.d(TAG, "Exception closing web socket", wse);
+            if (Log.isLoggable(TAG, DEBUG))
+                Log.d(TAG, "Exception closing web socket", wse);
 		}
 	}
 
-	public synchronized void close(final boolean isForced) throws WebSocketException {
-		if (!connected) {
-			return;
-		}
+    public synchronized void close(final boolean isForced) throws WebSocketException {
+        if (!connected) {
+            return;
+        }
 
-		new Thread(new Runnable() {
+        new Thread(new Runnable() {
 
-			@Override
-			public void run() {
-				try {
-					sendCloseHandshake();
+            @Override
+            public void run() {
+                try {
+                    sendCloseHandshake();
 
-					if (receiver.isRunning()) {
-						receiver.stopit();
-					}
+                    if (receiver.isRunning()) {
+                        receiver.stopit();
+                    }
 
-					closeStreams();
+                    closeStreams();
 
-					if(!isForced){
-						eventHandler.onClose();
-					}else{
-						eventHandler.onForcedClose();
-					}
-				} catch (Exception e) {
-					eventHandler.onException(e);
-				}
-			}
-		}).start();
-	}
+                    if(!isForced){
+                        eventHandler.onClose();
+                    }else{
+                        eventHandler.onForcedClose();
+                    }
+                } catch (Exception e) {
+                    eventHandler.onException(e);
+                }
+            }
+        }).start();
+    }
 
 	private synchronized void sendCloseHandshake() throws WebSocketException
 	{
@@ -271,11 +276,11 @@ public class WebSocket
 		}
 
 		try {
-			sender.send(OPCODE_CLOSE, true, new byte[0]);
+            sender.send(OPCODE_CLOSE, true, new byte[0]);
 			//this.sendFrame(OPCODE_CLOSE, true, new byte[0]);
 		} catch (WebSocketException e) {
-			throw new WebSocketException("error while sending close handshake",
-					e);
+            throw new WebSocketException("error while sending close handshake",
+                    e);
 		}
 
 		connected = false;
@@ -295,8 +300,8 @@ public class WebSocket
 			}
 			try {
 				socket = new Socket(host, port);
-				socket.setKeepAlive(true);
-				socket.setSoTimeout(0);
+                socket.setKeepAlive(true);
+                socket.setSoTimeout(0);
 			} catch (UnknownHostException uhe) {
 				throw new WebSocketException("unknown host: " + host, uhe);
 			} catch (IOException ioe) {
@@ -337,7 +342,7 @@ public class WebSocket
 		return VERSION;
 	}
 
-	public boolean isConnected() {
-		return connected;
-	}
+    public boolean isConnected() {
+        return connected;
+    }
 }

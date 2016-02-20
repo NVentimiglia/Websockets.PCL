@@ -16,7 +16,8 @@ namespace Websockets.WP8
         public event Action<string> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
-        
+        public event Action<IWebSocketConnection> OnDispose = delegate { };
+
         /// <summary>
         /// Factory Initializer
         /// </summary>
@@ -64,6 +65,7 @@ namespace Websockets.WP8
 
         public void Dispose()
         {
+            OnDispose(this);
             Close();
         }
 

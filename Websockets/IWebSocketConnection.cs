@@ -19,6 +19,8 @@ namespace Websockets
 
         event Action OnClosed;
 
+        event Action<IWebSocketConnection> OnDispose;
+
         event Action<string> OnError;
 
         event Action<string> OnMessage;
