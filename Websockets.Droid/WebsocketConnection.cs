@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Websockets.DroidBridge;
 
 namespace Websockets.Droid
@@ -24,7 +25,7 @@ namespace Websockets.Droid
         {
             System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
         }
-        
+
         /// <summary>
         /// Factory Initializer
         /// </summary>
@@ -52,8 +53,6 @@ namespace Websockets.Droid
             {
                 _controller = new BridgeController();
                 _controller.Proxy = this;
-                _controller.Proxy = this;
-                _controller.Proxy = this;
                 _controller.Open(url, protocol);
             }
             catch (Exception ex)
@@ -79,10 +78,12 @@ namespace Websockets.Droid
 
         public void Send(string message)
         {
+            if (string.IsNullOrEmpty(message))
+                return;
+
             try
             {
                 _controller.Send(message);
-
             }
             catch (Exception ex)
             {
@@ -94,33 +95,68 @@ namespace Websockets.Droid
 
         public override unsafe void RaiseClosed()
         {
-            base.RaiseClosed();
-            OnClosed();
+            try
+            {
+                OnClosed();
+                base.RaiseClosed();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         public override unsafe void RaiseError(string p1)
         {
-            base.RaiseError(p1);
-            OnError(p1);
+            try
+            {
+                OnError(p1);
+                base.RaiseError(p1);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         public override unsafe void RaiseLog(string p1)
         {
-            base.RaiseLog(p1);
-            OnLog(p1);
+            try
+            {
+                OnLog(p1);
+                base.RaiseLog(p1);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         public override unsafe void RaiseMessage(string p1)
         {
-            base.RaiseMessage(p1);
-            OnMessage(p1);
+            try
+            {
+                OnMessage(p1);
+                base.RaiseMessage(p1);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         public override unsafe void RaiseOpened()
         {
-            IsOpen = true;
-            base.RaiseOpened();
-            OnOpened();
+            try
+            {
+                IsOpen = true;
+                OnOpened();
+                base.RaiseOpened();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
     }
 }

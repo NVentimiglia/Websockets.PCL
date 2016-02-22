@@ -8,6 +8,7 @@
  * .NET Methods <-->  BridgeClient (Java / NDK) <--->  Websocket (Java)
  */
 package websockets.DroidBridge;
+
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -35,32 +36,31 @@ public class BridgeController {
 
     public BridgeController() {
         Log.d(TAG, "ctor");
-        mainHandler   = new Handler(Looper.getMainLooper());
+        mainHandler = new Handler(Looper.getMainLooper());
     }
 
     // connect websocket
     public void Open(final String wsuri, final String protocol) {
         Log("BridgeController:Open");
 
-        Thread thread = new Thread(new Runnable(){
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     URI connectionUri = new URI(wsuri);
-                    if(protocol == null || protocol.isEmpty())
+                    if (protocol == null || protocol.isEmpty())
                         mConnection = new WebSocket(connectionUri);
                     else
                         mConnection = new WebSocket(connectionUri, protocol);
                     addSocketEventsListener();
                     mConnection.connect();
                 } catch (WebSocketException e) {
-                    Error("BridgeController:Open:Exception "+ e.getMessage());
+                    Error("BridgeController:Open:Exception " + e.getMessage());
                     Error(e.getMessage());
                 } catch (URISyntaxException e) {
-                    Error("BridgeController:Open:Exception "+ e.getMessage()+" "+e.getReason());
-                }
-                catch (Exception e){
-                    Error("BridgeController:Open:Exception "+ e.getMessage());
+                    Error("BridgeController:Open:Exception " + e.getMessage() + " " + e.getReason());
+                } catch (Exception e) {
+                    Error("BridgeController:Open:Exception " + e.getMessage());
                 }
             }
         });
@@ -70,15 +70,14 @@ public class BridgeController {
 
     public void Close() {
 
-        Thread thread = new Thread(new Runnable(){
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                if(mConnection == null)
+                if (mConnection == null)
                     return;
                 try {
                     mConnection.close(true);
                 } catch (Exception ex) {
-                    Error("BridgeController:Close:Exception");
                     Error(ex.getMessage());
                 }
             }
@@ -91,15 +90,14 @@ public class BridgeController {
 
     // send a message
     public void Send(final String message) {
-        Thread thread = new Thread(new Runnable(){
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                if(mConnection == null)
+                if (mConnection == null)
                     return;
                 try {
                     mConnection.send(message);
                 } catch (Exception ex) {
-                    Error("BridgeController:Send:Exception");
                     Error(ex.getMessage());
                 }
             }
@@ -169,27 +167,95 @@ public class BridgeController {
     }
 
     private void RaiseOpened() {
-        if(proxy != null)
-            proxy.RaiseOpened();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (proxy == null)
+                    return;
+                try {
+                    if (proxy != null)
+                        proxy.RaiseOpened();
+                } catch (Exception ex) {
+
+                }
+            }
+        });
+        thread.start();
+
     }
 
     private void RaiseClosed() {
-        if(proxy != null)
-            proxy.RaiseClosed();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (proxy == null)
+                    return;
+                try {
+                    if (proxy != null)
+                        proxy.RaiseClosed();
+                } catch (Exception ex) {
+
+                }
+            }
+        });
+        thread.start();
+
     }
 
-    private void RaiseMessage(String message) {
-        if(proxy != null)
-            proxy.RaiseMessage(message);
+    private void RaiseMessage(final String message) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (proxy == null)
+                    return;
+                try {
+                    if (proxy != null)
+                        proxy.RaiseMessage(message);
+                } catch (Exception ex) {
+
+                }
+
+            }
+        });
+        thread.start();
+
     }
 
-    private void RaiseLog(String message) {
-        if(proxy != null)
-            proxy.RaiseLog(message);
+    private void RaiseLog(final String message) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (proxy == null)
+                    return;
+                try {
+                    if (proxy != null)
+                        proxy.RaiseLog(message);
+                } catch (Exception ex) {
+
+                }
+
+            }
+        });
+        thread.start();
+
     }
 
-    private void RaiseError(String message) {
-        if(proxy != null)
-            proxy.RaiseError(message);
+    private void RaiseError(final String message) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (proxy == null)
+                    return;
+                try {
+                    if (proxy != null)
+                        proxy.RaiseError(message);
+                } catch (Exception ex) {
+
+                }
+
+            }
+        });
+        thread.start();
+
     }
 }

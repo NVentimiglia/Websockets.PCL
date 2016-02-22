@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+    <metadata>
+        <id>Websockets.Pcl</id>
+        <version>1.1.2</version>
+        <title>Websockets Portable</title>
+        <authors>Nicholas Ventimiglia</authors>
+        <owners>Nicholas Ventimiglia</owners>
+        <projectUrl>https://github.com/NVentimiglia/Websockets.PCL</projectUrl>
+        <iconUrl>https://avatars3.githubusercontent.com/u/125889?v=3&amp;s=460</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <developmentDependency>true</developmentDependency>
+        <description>C# Websockets for all platforms using native bridges.</description>
+        <summary>C# Websockets for all platforms using native bridges. Compatable with Xamarin.</summary>
+        <releaseNotes>Fix for Droid</releaseNotes>
+        <copyright>Nicholas Ventimiglia</copyright>
+        <language>en-001</language>
+        <tags>Xamarin, Pcl, Websockets, Android, Ios, Xamarin, Portable, Universal, WP8, Net45</tags>
+        <dependencies>
+            <group targetFramework="WindowsPhone8.0">
+                <dependency id="WebSocket4Net" version="0.14.1" />
+            </group>
+            <group targetFramework="MonoTouch0.0">
+                <dependency id="Square.SocketRocket" version="0.4.2.0" />
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="..\Websockets.Droid\bin\Release\Websockets.Droid.dll" target="lib\MonoAndroid\Websockets.Droid.dll" />
+        <file src="..\Websockets.Droid\bin\Release\WebSockets.PCL.dll" target="lib\MonoAndroid\WebSockets.PCL.dll" />
+        <file src="..\Websockets.Net\bin\Release\Websockets.Net.dll" target="lib\net45\Websockets.Net.dll" />
+        <file src="..\Websockets.Net\bin\Release\WebSockets.PCL.dll" target="lib\net45\WebSockets.PCL.dll" />
+        <file src="..\Websockets.Net\bin\Release\WebSockets.PCL.dll" target="lib\portable-net45+win+wpa81+wp80+MonoAndroid10+xamarinios10\WebSockets.PCL.dll" />
+        <file src="..\Websockets.Universal\bin\Release\WebSockets.PCL.dll" target="lib\uap10.0\WebSockets.PCL.dll" />
+        <file src="..\Websockets.Universal\bin\Release\Websockets.Universal.dll" target="lib\uap10.0\Websockets.Universal.dll" />
+        <file src="..\Websockets.WP8\Bin\Release\WebSockets.PCL.dll" target="lib\wp8\WebSockets.PCL.dll" />
+        <file src="..\Websockets.WP8\Bin\Release\Websockets.WP8.dll" target="lib\wp8\Websockets.WP8.dll" />
+        <file src="..\Websockets.Ios\bin\iPhone\Release\Websockets.Ios.dll" target="lib\xamarinios10\Websockets.Ios.dll" />
+        <file src="..\Websockets.Ios\bin\iPhone\Release\WebSockets.PCL.dll" target="lib\xamarinios10\WebSockets.PCL.dll" />
+    </files>
+</package>
