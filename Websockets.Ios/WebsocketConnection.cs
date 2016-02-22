@@ -28,14 +28,14 @@ namespace Websockets.Ios
         {
             WebSocketFactory.Init(() => new WebsocketConnection());
         }
-        
+
         private WebSocket _client = null;
 
         public void Open(string url, string protocol = null)
         {
             try
             {
-                if(_client != null)
+                if (_client != null)
                     Close();
 
                 if (string.IsNullOrEmpty(protocol))
@@ -111,7 +111,7 @@ namespace Websockets.Ios
 
         private void _client_WebSocketOpened(object sender, EventArgs e)
         {
-			IsOpen = true;
+            IsOpen = true;
             OnOpened();
         }
 
@@ -127,14 +127,15 @@ namespace Websockets.Ios
         }
 
         private void _client_WebSocketClosed(object sender, WebSocketClosedEventArgs e)
-		{
-			IsOpen = false;
+        {
+            IsOpen = false;
             OnClosed();
         }
 
         private void _client_ReceivedMessage(object sender, WebSocketReceivedMessageEventArgs e)
         {
-            OnMessage(e.Message.ToString());
+            if (e != null && e.Message != null)
+                OnMessage(e.Message.ToString());
         }
     }
 }
