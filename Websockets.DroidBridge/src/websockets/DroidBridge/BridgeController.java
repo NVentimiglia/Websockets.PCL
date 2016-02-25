@@ -137,27 +137,52 @@ public class BridgeController {
     }
 
     private void RaiseOpened() {
-        if(proxy != null)
-            proxy.RaiseOpened();
+      try{
+          if(proxy != null)
+              proxy.RaiseOpened();
+      }catch(Exception ex){
+          RaiseClosed();
+          Error("Failed to Open");
+      }
     }
 
     private void RaiseClosed() {
-        if(proxy != null)
-            proxy.RaiseClosed();
+        try{
+            if(proxy != null)
+                proxy.RaiseClosed();
+        }catch(Exception ex){
+            RaiseClosed();
+            Error("Failed to Close");
+        }
     }
 
     private void RaiseMessage(String message) {
-        if(proxy != null)
-            proxy.RaiseMessage(message);
+        try{
+            if(proxy != null)
+                proxy.RaiseMessage(message);
+        }catch(Exception ex){
+            RaiseClosed();
+            Error("Failed to Raise");
+        }
     }
 
     private void RaiseLog(String message) {
-        if(proxy != null)
-            proxy.RaiseLog(message);
+        try{
+            if(proxy != null)
+                proxy.RaiseLog(message);
+        }catch(Exception ex){
+            RaiseClosed();
+            Error("Failed to Log");
+        }
     }
 
     private void RaiseError(String message) {
-        if(proxy != null)
-            proxy.RaiseError(message);
+        try{
+            if(proxy != null)
+                proxy.RaiseError(message);
+        }catch(Exception ex){
+            RaiseClosed();
+            Error("Failed to Error");
+        }
     }
 }
