@@ -12,6 +12,7 @@ namespace Websockets.Ios
 
         public event Action OnClosed = delegate { };
         public event Action OnOpened = delegate { };
+        public event Action<IWebSocketConnection> OnDispose = delegate { };
         public event Action<string> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
         public event Action<string> OnLog = delegate { };
@@ -92,7 +93,8 @@ namespace Websockets.Ios
         {
             try
             {
-                _client.Send(new NSString(message));
+                if (_client != null)
+                    _client.Send(new NSString(message));
             }
             catch (Exception ex)
             {
@@ -103,6 +105,7 @@ namespace Websockets.Ios
         public void Dispose()
         {
             Close();
+            OnDispose(this);
         }
 
 

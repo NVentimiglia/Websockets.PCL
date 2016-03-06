@@ -12,6 +12,7 @@ namespace Websockets.Droid
 
         public event Action OnClosed = delegate { };
         public event Action OnOpened = delegate { };
+        public event Action<IWebSocketConnection> OnDispose = delegate { };
         public event Action<string> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
         public event Action<byte[]> OnData = delegate { };
@@ -34,8 +35,15 @@ namespace Websockets.Droid
 
         public void Close()
         {
-            IsOpen = false;
-            _controller.Close();
+            try
+            {
+                IsOpen = false;
+                _controller.Close();
+            }
+            catch (Exception ex)
+            {
+                OnError(ex.Message);
+            }
         }
 
         public void Open(string url, string protocol = null)
@@ -59,6 +67,7 @@ namespace Websockets.Droid
             try
             {
                 Close();
+                OnDispose(this);
                 base.Dispose(disposing);
             }
             catch (Exception ex)
