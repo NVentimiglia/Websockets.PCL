@@ -94,33 +94,34 @@ namespace Websockets.Droid
 
         public override unsafe void RaiseClosed()
         {
-            base.RaiseClosed();
+            IsOpen = false;
             OnClosed();
+            base.RaiseClosed();
         }
 
         public override unsafe void RaiseError(string p1)
         {
-            base.RaiseError(p1);
             OnError(p1);
+            base.RaiseError(p1);
         }
 
         public override unsafe void RaiseLog(string p1)
         {
-            base.RaiseLog(p1);
             OnLog(p1);
+            base.RaiseLog(p1);
         }
 
         public override unsafe void RaiseMessage(string p1)
         {
-            base.RaiseMessage(p1);
             OnMessage(p1);
+            base.RaiseMessage(p1);
         }
 
         public override unsafe void RaiseOpened()
         {
             IsOpen = true;
-            base.RaiseOpened();
             OnOpened();
+            base.RaiseOpened();
         }
     }
 }

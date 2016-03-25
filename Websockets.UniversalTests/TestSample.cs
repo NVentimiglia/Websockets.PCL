@@ -62,7 +62,15 @@ namespace Websockets.UniversalTests
 
             Debug.WriteLine("Received !");
 
-            Debug.WriteLine("Passed !");
+
+            connection.Close();
+
+            while (connection.IsOpen)
+            {
+                await Task.Delay(10);
+            }
+
+            Debug.WriteLine("Closed !");
         }
 
         private void Connection_OnOpened()

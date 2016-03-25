@@ -102,8 +102,6 @@ namespace Websockets.Universal
         {
             if (_websocket != null)
             {
-                _websocket.Closed -= _websocket_Closed;
-                _websocket.MessageReceived -= _websocket_MessageReceived;
                 _websocket.Dispose();
                 _websocket = null;
 
