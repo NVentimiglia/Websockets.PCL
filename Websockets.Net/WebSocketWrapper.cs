@@ -44,9 +44,14 @@ namespace Websockets.Net
         /// Connects to the WebSocket server.
         /// </summary>
         /// <returns></returns>
-        public async Task Connect(string uri)
+        public async Task Connect(string uri, string protocol = null)
         {
-            await _ws.ConnectAsync(new Uri(uri), _cancellationToken);
+			if (protocol != null)
+			{
+				_ws.Options.AddSubProtocol(protocol);
+			}
+
+			await _ws.ConnectAsync(new Uri(uri), _cancellationToken);
             CallOnConnected();
             StartListen();
         }
