@@ -49,7 +49,7 @@ namespace Websockets.Net
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
 
-                await _websocket.Connect(url);
+                await _websocket.Connect(url, protocol);
 
             }
             catch (Exception ex)
