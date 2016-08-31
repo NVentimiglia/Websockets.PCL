@@ -42,7 +42,11 @@ public class BridgeController {
     public void Open(final String wsuri, final String protocol) {
         Log("BridgeController:Open");
 
-        AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
+		int port = 80;
+		if (wsuri.indexOf(":") > 0)
+			port = Integer.parseInt(wsuri.substring(wsuri.indexOf(":")));
+
+        AsyncHttpClient(port).getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
                 new X509TrustManager() {
                     public void checkClientTrusted(X509Certificate[] chain, String authType) {}
                     public void checkServerTrusted(X509Certificate[] chain, String authType) {}
@@ -56,13 +60,12 @@ public class BridgeController {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, null, null);
 
-            AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setSSLContext(sslContext);
+            AsyncHttpClient(port).getDefaultInstance().getSSLSocketMiddleware().setSSLContext(sslContext);
         } catch (Exception e){
             Log.d("SSLCONFIG", e.toString(), e);
         }
 
-
-        AsyncHttpClient.getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
+        AsyncHttpClient(port).getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
                 .WebSocketConnectCallback()
         {
             @Override
