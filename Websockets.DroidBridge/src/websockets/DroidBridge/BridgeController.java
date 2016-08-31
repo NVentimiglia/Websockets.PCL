@@ -44,7 +44,7 @@ public class BridgeController {
 
 		int port = 80;
 		if (wsuri.indexOf(":") > 0)
-			port = Integer.parseInt(wsuri.substring(wsuri.indexOf(":")));
+			port = Integer.parseInt(wsuri.substring(wsuri.indexOf(":")+1));
 
         AsyncHttpClient(port).getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
                 new X509TrustManager() {
