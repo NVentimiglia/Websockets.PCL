@@ -47,7 +47,9 @@ namespace Websockets.Universal
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
 
-                _websocket.ConnectAsync(new Uri(url)).Completed = (source, status) =>
+                Uri uri = new Uri(url);
+                int port = uri.Port.ToString();
+                _websocket.ConnectAsync(uri, port).Completed = (source, status) =>
                 {
                     if (status == AsyncStatus.Completed)
                     {
