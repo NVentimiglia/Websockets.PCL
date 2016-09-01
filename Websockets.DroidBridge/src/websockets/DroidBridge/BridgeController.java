@@ -43,9 +43,13 @@ public class BridgeController {
         Log("BridgeController:Open");
 
 		int port = 80;
-		if (wsuri.indexOf(":") > 0)
-			port = Integer.parseInt(wsuri.substring(wsuri.indexOf(":")+1));
-
+		// Get the port number via the 2nd ":".
+		String uristring = wsuri.substring(wsuri.indexOf(":")+1);
+		if (uristring.indexOf(":") > 0)
+		{
+			port = Integer.parseInt(uristring.substring(uristring.indexOf(":")+1));
+		}
+		
         AsyncHttpClient(port).getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
                 new X509TrustManager() {
                     public void checkClientTrusted(X509Certificate[] chain, String authType) {}
