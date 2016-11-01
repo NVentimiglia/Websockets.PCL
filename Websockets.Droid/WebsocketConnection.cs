@@ -46,7 +46,7 @@ namespace Websockets.Droid
             }
         }
 
-        public void Open(string url, string protocol = null)
+        public void Open(string url, string protocol = null, string authToken = null)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace Websockets.Droid
                 _controller.Proxy = this;
                 _controller.Proxy = this;
                 _controller.Proxy = this;
-                _controller.Open(url, protocol);
+                _controller.Open(url, protocol, authToken);
             }
             catch (Exception ex)
             {

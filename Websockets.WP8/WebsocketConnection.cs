@@ -28,7 +28,7 @@ namespace Websockets.WP8
 
         protected WebSocket websocket;
 
-        public void Open(string url, string protocol = null)
+        public void Open(string url, string protocol = null, string authToken = null)
         {
             Close();
 
@@ -36,6 +36,12 @@ namespace Websockets.WP8
                 url = url.Replace("https://", "wss://");
             else if (url.StartsWith("http"))
                 url = url.Replace("http://", "ws://");
+
+            if (authToken != null)
+            {
+                throw new NotImplementedException();
+                //_websocket.SetRequestHeader("Authorization", bearerToken});
+            }
 
             websocket = new WebSocket(url, protocol);
             websocket.Opened += Websocket_Opened;

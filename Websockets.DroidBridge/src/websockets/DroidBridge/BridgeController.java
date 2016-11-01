@@ -13,8 +13,11 @@ import android.os.Looper;
 import android.util.Log;
 
 //https://github.com/koush/AndroidAsync
+import com.koushikdutta.async.AsyncServer;
 import com.koushikdutta.async.callback.CompletedCallback;
 import com.koushikdutta.async.http.AsyncHttpClient;
+import com.koushikdutta.async.http.AsyncHttpGet;
+import com.koushikdutta.async.http.AsyncHttpRequest;
 import com.koushikdutta.async.http.WebSocket;
 
 import javax.net.ssl.SSLContext;
@@ -39,7 +42,7 @@ public class BridgeController {
     }
 
     // connect websocket
-    public void Open(final String wsuri, final String protocol) {
+    public void Open(final String wsuri, final String protocol, final String authToken) {
         Log("BridgeController:Open");
 
         AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
@@ -61,15 +64,15 @@ public class BridgeController {
             Log.d("SSLCONFIG", e.toString(), e);
         }
 
-
-        AsyncHttpClient.getDefaultInstance().websocket(wsuri, protocol, new AsyncHttpClient
-                .WebSocketConnectCallback()
-        {
+        AsyncHttpGet get = new AsyncHttpGet(wsuri.replace("ws://", "http://").replace("wss://", "https://"));
+        if (authToken != null) {
+            get.addHeader("Authorization", authToken);
+        }
+        AsyncHttpClient.getDefaultInstance().websocket((AsyncHttpRequest)get, protocol, new AsyncHttpClient
+                .WebSocketConnectCallback() {
             @Override
-            public void onCompleted(Exception ex, WebSocket webSocket)
-            {
-                if (ex != null)
-                {
+            public void onCompleted(Exception ex, WebSocket webSocket) {
+                if (ex != null) {
                     Error(ex.toString());
                     return;
                 }
@@ -77,21 +80,17 @@ public class BridgeController {
                 mConnection = webSocket;
                 RaiseOpened();
 
-                webSocket.setClosedCallback(new CompletedCallback()
-                {
+                webSocket.setClosedCallback(new CompletedCallback() {
                     @Override
-                    public void onCompleted(Exception e)
-                    {
+                    public void onCompleted(Exception e) {
                         mConnection = null;
                         RaiseClosed();
                     }
                 });
 
 
-                webSocket.setStringCallback(new WebSocket.StringCallback()
-                {
-                    public void onStringAvailable(final String s)
-                    {
+                webSocket.setStringCallback(new WebSocket.StringCallback() {
+                    public void onStringAvailable(final String s) {
                         RaiseMessage(s);
                     }
                 });

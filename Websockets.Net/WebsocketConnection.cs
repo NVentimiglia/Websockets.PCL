@@ -31,7 +31,7 @@ namespace Websockets.Net
 
         private WebSocketWrapper _websocket = null;
 
-        public async void Open(string url, string protocol = null)
+        public async void Open(string url, string protocol = null, string authToken = null)
         {
             try
             {
@@ -48,8 +48,8 @@ namespace Websockets.Net
                     url = url.Replace("https://", "wss://");
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
-
-                await _websocket.Connect(url, protocol);
+                
+                await _websocket.Connect(url, protocol, authToken);
 
             }
             catch (Exception ex)

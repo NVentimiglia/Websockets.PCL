@@ -9,7 +9,7 @@ namespace Websockets
     {
         bool IsOpen { get; }
 
-        void Open(string url, string protocol = null);
+        void Open(string url, string protocol = null, string authToken = null);
 
         void Close();
 
