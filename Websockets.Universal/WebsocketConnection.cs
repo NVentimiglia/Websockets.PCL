@@ -30,7 +30,7 @@ namespace Websockets.Universal
         private MessageWebSocket _websocket;
         private DataWriter messageWriter;
 
-        public void Open(string url, string protocol = null)
+        public void Open(string url, string protocol = null, string authToken = null)
         {
             try
             {
@@ -46,6 +46,11 @@ namespace Websockets.Universal
                     url = url.Replace("https://", "wss://");
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
+
+                if (authToken != null)
+                {
+                    _websocket.SetRequestHeader("Authorization", authToken);
+                }
 
                 _websocket.ConnectAsync(new Uri(url)).Completed = (source, status) =>
                 {

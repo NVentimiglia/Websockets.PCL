@@ -44,12 +44,16 @@ namespace Websockets.Net
         /// Connects to the WebSocket server.
         /// </summary>
         /// <returns></returns>
-        public async Task Connect(string uri, string protocol = null)
+        public async Task Connect(string uri, string protocol = null, string authToken = null)
         {
 			if (protocol != null)
 			{
 				_ws.Options.AddSubProtocol(protocol);
 			}
+            if (authToken != null)
+            {
+                _ws.Options.SetRequestHeader("Authorization", authToken);
+            }
 
 			await _ws.ConnectAsync(new Uri(uri), _cancellationToken);
             CallOnConnected();

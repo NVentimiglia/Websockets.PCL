@@ -32,17 +32,25 @@ namespace Websockets.Ios
 
         private WebSocket _client = null;
 
-        public void Open(string url, string protocol = null)
+        public void Open(string url, string protocol = null, string authToken = null)
         {
             try
             {
                 if (_client != null)
                     Close();
 
+                NSUrlRequest req = new NSUrlRequest(new NSUrl(url));
+                if (!string.IsNullOrEmpty(authToken))
+                {
+                    NSMutableUrlRequest mutableRequest = new NSMutableUrlRequest(new NSUrl(url));
+                    mutableRequest["Authorization"] = authToken;
+                    req = (NSUrlRequest)mutableRequest.Copy();
+                }
+
                 if (string.IsNullOrEmpty(protocol))
-                    _client = new WebSocket(new NSUrl(url));
+                    _client = new WebSocket(req);
                 else
-                    _client = new WebSocket(new NSUrl(url), new NSObject[] { new NSString(protocol) });
+                    _client = new WebSocket(req, new NSObject[] { new NSString(protocol) });
 
                 _client.ReceivedMessage += _client_ReceivedMessage;
                 _client.WebSocketClosed += _client_WebSocketClosed;
