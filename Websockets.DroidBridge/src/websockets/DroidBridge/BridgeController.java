@@ -24,6 +24,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 
 public class BridgeController {
@@ -42,7 +43,7 @@ public class BridgeController {
     }
 
     // connect websocket
-    public void Open(final String wsuri, final String protocol, final String authToken) {
+    public void Open(final String wsuri, final String protocol, final Map<String, String> headers) {
         Log("BridgeController:Open");
 
         AsyncHttpClient.getDefaultInstance().getSSLSocketMiddleware().setTrustManagers(new TrustManager[] {
@@ -65,8 +66,8 @@ public class BridgeController {
         }
 
         AsyncHttpGet get = new AsyncHttpGet(wsuri.replace("ws://", "http://").replace("wss://", "https://"));
-        if (authToken != null) {
-            get.addHeader("Authorization", authToken);
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            get.addHeader(entry.getKey(), entry.getValue());
         }
         AsyncHttpClient.getDefaultInstance().websocket((AsyncHttpRequest)get, protocol, new AsyncHttpClient
                 .WebSocketConnectCallback() {

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -44,15 +45,18 @@ namespace Websockets.Net
         /// Connects to the WebSocket server.
         /// </summary>
         /// <returns></returns>
-        public async Task Connect(string uri, string protocol = null, string authToken = null)
+        public async Task Connect(string uri, string protocol = null, IDictionary<string, string> headers = null)
         {
 			if (protocol != null)
 			{
 				_ws.Options.AddSubProtocol(protocol);
 			}
-            if (authToken != null)
+            if (headers != null)
             {
-                _ws.Options.SetRequestHeader("Authorization", authToken);
+                foreach (var header in headers)
+                {
+                    _ws.Options.SetRequestHeader(header.Key, header.Value);
+                }
             }
 
 			await _ws.ConnectAsync(new Uri(uri), _cancellationToken);

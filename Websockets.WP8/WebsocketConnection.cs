@@ -1,6 +1,7 @@
 using System;
 using SuperSocket.ClientEngine;
 using WebSocket4Net;
+using System.Collections.Generic;
 
 namespace Websockets.WP8
 {
@@ -30,6 +31,17 @@ namespace Websockets.WP8
 
         public void Open(string url, string protocol = null, string authToken = null)
         {
+            var headers = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            if (authToken != null)
+            {
+                headers.Add("Authorization", authToken);
+            }
+
+            Open(url, protocol, headers);
+        }
+
+        public void Open(string url, string protocol, IDictionary<string, string> headers)
+        {
             Close();
 
             if (url.StartsWith("https"))
@@ -37,10 +49,13 @@ namespace Websockets.WP8
             else if (url.StartsWith("http"))
                 url = url.Replace("http://", "ws://");
 
-            if (authToken != null)
+            if (headers != null && headers.Count > 0)
             {
                 throw new NotImplementedException();
-                //_websocket.SetRequestHeader("Authorization", bearerToken});
+                //foreach (var entry in headers)
+                //{
+                //    _websocket.SetRequestHeader(entry.Key, entry.Value);
+                //}
             }
 
             websocket = new WebSocket(url, protocol);

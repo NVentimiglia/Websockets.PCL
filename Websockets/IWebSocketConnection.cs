@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Websockets
 {
@@ -10,6 +11,8 @@ namespace Websockets
         bool IsOpen { get; }
 
         void Open(string url, string protocol = null, string authToken = null);
+
+        void Open(string url, string protocol, IDictionary<string, string> headers);
 
         void Close();
 
