@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Websockets.DroidBridge;
 
 namespace Websockets.Droid
@@ -48,13 +49,22 @@ namespace Websockets.Droid
 
         public void Open(string url, string protocol = null, string authToken = null)
         {
+            var headers = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            if (authToken != null)
+            {
+                headers.Add("Authorization", authToken);
+            }
+
+            Open(url, protocol, headers);
+        }
+
+        public void Open(string url, string protocol, IDictionary<string, string> headers)
+        {
             try
             {
                 _controller = new BridgeController();
                 _controller.Proxy = this;
-                _controller.Proxy = this;
-                _controller.Proxy = this;
-                _controller.Open(url, protocol, authToken);
+                _controller.Open(url, protocol, headers);
             }
             catch (Exception ex)
             {

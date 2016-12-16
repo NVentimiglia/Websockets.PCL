@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Windows.Foundation;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -32,6 +33,17 @@ namespace Websockets.Universal
 
         public void Open(string url, string protocol = null, string authToken = null)
         {
+            var headers = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
+            if (authToken != null)
+            {
+                headers.Add("Authorization", authToken);
+            }
+
+            Open(url, protocol, headers);
+        }
+
+        public void Open(string url, string protocol, IDictionary<string, string> headers)
+        {
             try
             {
                 if (_websocket != null)
@@ -47,9 +59,12 @@ namespace Websockets.Universal
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
 
-                if (authToken != null)
+                if (headers != null)
                 {
-                    _websocket.SetRequestHeader("Authorization", authToken);
+                    foreach (var entry in headers)
+                    {
+                        _websocket.SetRequestHeader(entry.Key, entry.Value);
+                    }
                 }
 
                 _websocket.ConnectAsync(new Uri(url)).Completed = (source, status) =>

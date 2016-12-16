@@ -1,7 +1,7 @@
 using System;
 using Foundation;
 using Square.SocketRocket;
-
+using System.Collections.Generic;
 
 namespace Websockets.Ios
 {
@@ -34,16 +34,30 @@ namespace Websockets.Ios
 
         public void Open(string url, string protocol = null, string authToken = null)
         {
+            var headers = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+            if (authToken != null)
+            {
+                headers.Add("Authorization", authToken);
+            }
+
+            Open(url, protocol, headers);
+        }
+
+        public void Open(string url, string protocol, IDictionary<string, string> headers = null)
+        {
             try
             {
                 if (_client != null)
                     Close();
 
                 NSUrlRequest req = new NSUrlRequest(new NSUrl(url));
-                if (!string.IsNullOrEmpty(authToken))
+                if (headers?.Count > 0)
                 {
                     NSMutableUrlRequest mutableRequest = new NSMutableUrlRequest(new NSUrl(url));
-                    mutableRequest["Authorization"] = authToken;
+                    foreach (var header in headers)
+                    {
+                        mutableRequest[header.Key] = header.Value;
+                    }
                     req = (NSUrlRequest)mutableRequest.Copy();
                 }
 
