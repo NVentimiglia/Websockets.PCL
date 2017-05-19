@@ -148,7 +148,10 @@ namespace Websockets.Ios
             else
                 OnError("Unknown WebSocket Error!");
 
-            OnClosed();
+            if (IsOpen)
+            {
+                OnClosed();
+            }
         }
 
         private void _client_WebSocketClosed(object sender, WebSocketClosedEventArgs e)
