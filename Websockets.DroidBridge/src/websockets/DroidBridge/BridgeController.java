@@ -30,15 +30,17 @@ import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Map;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSession;
 
 
 public class BridgeController {
 
     private WebSocket mConnection;
     private boolean mIsAllTrusted;
-    private static String TAG = "websockets";
+    private static final String TAG = "websockets";
 
     //MUST BE SET
     public BridgeProxy proxy;
@@ -58,7 +60,22 @@ public class BridgeController {
         AsyncHttpClient client = AsyncHttpClient.getDefaultInstance();
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, null, null);
+            TrustManager[] trustManagers = null;
+            if (mIsAllTrusted) {
+                trustManagers = new TrustManager[] {
+                    new X509TrustManager() {
+                        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {
+                            for (X509Certificate c : chain) {
+                                Log.d(TAG, "chain: " + c.getSubjectX500Principal().getName());
+                            }
+                        }
+                        @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
+                    }
+                };
+                Log.d(TAG, "override trustmanager");
+            }
+            sslContext.init(null, trustManagers, null);
 
             SpdyMiddleware middleware = client.getSSLSocketMiddleware();
             
@@ -70,15 +87,12 @@ public class BridgeController {
             });
             middleware.setSSLContext(sslContext);
             if (mIsAllTrusted) {
-                middleware.setTrustManagers(new TrustManager[] {
-                    new X509TrustManager() {
-                        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-                        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {
-                            for (X509Certificate c : chain) {
-                                Log.d(TAG, "chain: " + c.getSubjectX500Principal().getName());
-                            }
-                        }
-                        @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[]{}; }
+                Log.d(TAG, "override trustmanager");
+                middleware.setTrustManagers(trustManagers);
+                middleware.setHostnameVerifier(new HostnameVerifier() {
+                    @Override
+                    public boolean verify(String s, SSLSession sslSession) {
+                        return true;
                     }
                 });
             }
