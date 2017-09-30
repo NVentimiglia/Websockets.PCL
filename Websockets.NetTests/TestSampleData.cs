@@ -1,41 +1,38 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using NUnit.Framework;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace Websockets.DroidTests
+
+namespace Websockets.NetTests
 {
-    [TestFixture]
-    public class TestSample
+    public class TestSampleData
     {
-        public static readonly string WSECHOD_URL = "wss://wsecho.n4v.eu";
-        //public static readonly string WSECHOD_URL = "wss://10.0.2.2:8081";
-
-        private IWebSocketConnection connection;
+        private Websockets.IWebSocketConnection connection;
         private bool Failed;
         private bool Echo;
 
-        [SetUp]
         public void Setup()
         {
             // 1) Link in your main activity
-            //Websockets.Droid.WebsocketConnection.Link();
+            //Websockets.Net.WebsocketConnection.Link();
         }
 
 
-        [Test]
-        public async void DoTest()
+        public async Task DoTest()
         {
             // 2) Call factory from your PCL code.
-            // This is the same as new   Websockets.Droid.WebsocketConnection();
+            // This is the same as new   Websockets.Droid.WebsocketConnectionDroid();
             // Except that the Factory is in a PCL and accessible anywhere
             connection = Websockets.WebSocketFactory.Create();
             connection.SetIsAllTrusted();
             connection.OnLog += Connection_OnLog;
             connection.OnError += Connection_OnError;
             connection.OnMessage += Connection_OnMessage;
+            connection.OnData += Connection_OnData;
             connection.OnOpened += Connection_OnOpened;
+            connection.OnClosed += Connection_OnClosed;
+            connection.OnDispose += Connection_OnDispose;
 
             //Timeout / Setup
             Echo = Failed = false;
@@ -46,7 +43,7 @@ namespace Websockets.DroidTests
 
             Debug.WriteLine("Connecting...");
 
-            connection.Open(WSECHOD_URL);
+            connection.Open(Program.WSECHOD_URL);
 
             while (!connection.IsOpen && !Failed)
             {
@@ -63,7 +60,8 @@ namespace Websockets.DroidTests
 
             Debug.WriteLine("Sending...");
 
-            connection.Send("Hello World");
+            var data = new byte[] { 0, (byte)'H', (byte)'I' };
+            connection.Send(data);
 
             Debug.WriteLine("Sent !");
 
@@ -75,22 +73,28 @@ namespace Websockets.DroidTests
             if (!Echo)
             {
                 token.Cancel();
+                connection.Dispose();
                 Assert.True(Echo);
                 return;
             }
 
             token.Cancel();
+            connection.Dispose();
 
             Debug.WriteLine("Received !");
 
             Debug.WriteLine("Passed !");
-            Trace.WriteLine("Passed");
             Assert.True(true);
         }
 
         private void Connection_OnOpened()
         {
             Debug.WriteLine("Opened !");
+        }
+
+        private void Connection_OnClosed()
+        {
+            Debug.WriteLine("Closed !");
         }
 
         async void Timeout(CancellationToken token)
@@ -113,6 +117,24 @@ namespace Websockets.DroidTests
             Echo = obj == "Hello World";
         }
 
+        private void Connection_OnData(byte[] data)
+        {
+            Echo = false;
+            var compare = new byte[] { 0, (byte)'H', (byte)'I' };
+            if (data.Length == compare.Length)
+            {
+                for (int i = 0; i < data.Length; i++)
+                {
+                    if (data[i] != compare[i])
+                    {
+                        return;
+                    }
+                }
+                Echo = true;
+                return;
+            }
+        }
+
         private void Connection_OnError(Exception ex)
         {
             Trace.WriteLine("ERROR " + ex.ToString());
@@ -124,13 +146,10 @@ namespace Websockets.DroidTests
             Trace.WriteLine(obj);
         }
 
-        [TearDown]
-        public void Tear()
+        private void Connection_OnDispose(IWebSocketConnection c)
         {
-            if (connection != null)
-            {
-                connection.Dispose();
-            }
+            Trace.WriteLine(GetType().ToString() + " dispose");
         }
+
     }
 }

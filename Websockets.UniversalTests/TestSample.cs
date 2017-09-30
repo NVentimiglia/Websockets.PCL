@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Websockets.UniversalTests
 {
-    public class TestsSample
+    public class TestSample
     {
+        public static readonly string WSECHOD_URL = "wss://wsecho.n4v.eu";
+        //public static readonly string WSECHOD_URL = "wss://localhost:8080";
+
         private Websockets.IWebSocketConnection connection;
         private bool Failed;
         private bool Echo;
@@ -14,7 +18,7 @@ namespace Websockets.UniversalTests
         public void Setup()
         {
             // 1) Link in your main activity
-            Websockets.Universal.WebsocketConnection.Link();
+            //Websockets.Universal.WebsocketConnection.Link();
         }
 
         
@@ -24,6 +28,7 @@ namespace Websockets.UniversalTests
             // This is the same as new   Websockets.Droid.WebsocketConnectionDroid();
             // Except that the Factory is in a PCL and accessible anywhere
             connection = Websockets.WebSocketFactory.Create();
+            connection.SetIsAllTrusted();
             connection.OnLog += Connection_OnLog;
             connection.OnError += Connection_OnError;
             connection.OnMessage += Connection_OnMessage;
@@ -31,12 +36,13 @@ namespace Websockets.UniversalTests
 
             //Timeout / Setup
             Echo = Failed = false;
-            Timeout();
+            var token = new CancellationTokenSource();
+            Timeout(token.Token);
 
             //Do test
 
             Debug.WriteLine("Connecting...");
-            connection.Open("http://echo.websocket.org");
+            connection.Open(WSECHOD_URL);
 
             while (!connection.IsOpen && !Failed)
             {
@@ -44,12 +50,18 @@ namespace Websockets.UniversalTests
             }
 
             if (!connection.IsOpen)
+            {
+                token.Cancel();
+                Assert.True(false);
                 return;
+            }
+
             Debug.WriteLine("Connected !");
 
-            Debug.WriteLine("HI");
             Debug.WriteLine("Sending...");
+
             connection.Send("Hello World");
+
             Debug.WriteLine("Sent !");
 
             while (!Echo && !Failed)
@@ -58,19 +70,21 @@ namespace Websockets.UniversalTests
             }
 
             if (!Echo)
+            {
+                token.Cancel();
+                connection.Dispose();
+                Assert.True(Echo);
                 return;
+            }
+
+            token.Cancel();
+            connection.Dispose();
 
             Debug.WriteLine("Received !");
 
+            Debug.WriteLine("Passed !");
 
-            connection.Close();
-
-            while (connection.IsOpen)
-            {
-                await Task.Delay(10);
-            }
-
-            Debug.WriteLine("Closed !");
+            Assert.True(true);
         }
 
         private void Connection_OnOpened()
@@ -78,11 +92,19 @@ namespace Websockets.UniversalTests
             Debug.WriteLine("Opened !");
         }
 
-        async void Timeout()
+        async void Timeout(CancellationToken token)
         {
-            await Task.Delay(120000);
-            Failed = true;
-            Debug.WriteLine("Timeout");
+            try
+            {
+                var t = Task.Delay(30000, token);
+                await t;
+                if (!t.IsCanceled)
+                {
+                    Debug.WriteLine("Timeout");
+                    Failed = true;
+                }
+            }
+            catch (TaskCanceledException) { }
         }
 
         private void Connection_OnMessage(string obj)
@@ -90,15 +112,15 @@ namespace Websockets.UniversalTests
             Echo = obj == "Hello World";
         }
 
-        private void Connection_OnError(string obj)
+        private void Connection_OnError(Exception ex)
         {
-            Debug.Write("ERROR " + obj);
+            Debug.WriteLine("ERROR " + ex.Message);
             Failed = true;
         }
 
         private void Connection_OnLog(string obj)
         {
-            Debug.Write(obj);
+            Debug.WriteLine(obj);
         }
     }
 }

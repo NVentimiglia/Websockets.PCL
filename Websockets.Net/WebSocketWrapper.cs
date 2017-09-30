@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -11,11 +12,11 @@ namespace Websockets.Net
     {
         public event Action<WebSocketWrapper> Opened;
         public event Action<string, WebSocketWrapper> MessageReceived;
+        public event Action<byte[], WebSocketWrapper> DataReceived;
         public event Action<WebSocketWrapper> Closed;
         public event Action<Exception> Error;
 
         private const int ReceiveChunkSize = 1024;
-        private const int SendChunkSize = 1024;
 
         private ClientWebSocket _ws;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -27,6 +28,8 @@ namespace Websockets.Net
         public WebSocketWrapper()
         {
             _ws = new ClientWebSocket();
+            _ws.Options.ClientCertificates = new System.Security.Cryptography.X509Certificates.X509Certificate2Collection();
+            _ws.Options.UseDefaultCredentials = false;
             _ws.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
             _cancellationToken = _cancellationTokenSource.Token;
         }
@@ -47,10 +50,10 @@ namespace Websockets.Net
         /// <returns></returns>
         public async Task Connect(string uri, string protocol = null, IDictionary<string, string> headers = null)
         {
-			if (protocol != null)
-			{
-				_ws.Options.AddSubProtocol(protocol);
-			}
+            if (protocol != null)
+            {
+                _ws.Options.AddSubProtocol(protocol);
+            }
             if (headers != null)
             {
                 foreach (var header in headers)
@@ -59,23 +62,43 @@ namespace Websockets.Net
                 }
             }
 
-			await _ws.ConnectAsync(new Uri(uri), _cancellationToken);
+            await _ws.ConnectAsync(new Uri(uri), CancellationToken.None); // no cancellation because we get state aborted
             CallOnConnected();
-            StartListen();
+            StartReceive();
         }
 
-        public async Task Disconnect()
+        public void Disconnect()
         {
             try
             {
-                _cancellationTokenSource.Cancel();
-                //Close Async not working, never ending await
-                await _ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None);
+                if (_cancellationTokenSource.Token.CanBeCanceled)
+                {
+                    _cancellationTokenSource.Cancel();
+                }
+
+                if (_ws.State == WebSocketState.Open)
+                {
+                    _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "1", CancellationToken.None).Wait(); // no cancellation because we get state aborted
+                }
+                else
+                {
+                    Debug.WriteLine("wsState: " + _ws.State.ToString());
+                }
+                Debug.WriteLine("Disconnect()");
+            }
+            catch (AggregateException ex)
+            {
+                ex.Handle((iex) =>
+                {
+                    Debug.WriteLine(string.Format("{0}: {1}: {2}", iex.GetType().ToString(), iex.Message, iex.StackTrace));
+                    return true;
+                });
             }
             catch (Exception ex)
             {
-                // DisposedObjectException, every time
-              //  CallOnError(ex);
+                // DisposedObjectException, every time, yeah but where does it come from?
+                //  CallOnError(ex);
+                Debug.WriteLine(string.Format("{0}: {1}: {2}", ex.GetType().ToString(), ex.Message, ex.StackTrace));
             }
         }
 
@@ -87,8 +110,7 @@ namespace Websockets.Net
         {
             if (_ws.State != WebSocketState.Open)
             {
-                if (Error != null)
-                    Error(new Exception("WebSocket:Send : Connection is not open."));
+                Error?.Invoke(new Exception("WebSocket: Send: Connection is not open."));
                 return;
             }
             try
@@ -105,8 +127,32 @@ namespace Websockets.Net
             }
         }
 
+        /// <summary>
+        /// Send binary data to the WebSocket server.
+        /// </summary>
+        /// <param name="data">The data to send</param>
+        public async Task SendData(byte[] data)
+        {
+            if (_ws.State != WebSocketState.Open)
+            {
+                Error?.Invoke(new Exception("WebSocket: SendData: Connection is not open."));
+                return;
+            }
+            try
+            {
+                using (await _asyncLock.LockAsync())
+                {
+                    await _ws.SendAsync(new ArraySegment<byte>(data), WebSocketMessageType.Binary, true, _cancellationToken);
+                }
+            }
+            catch (Exception ex)
+            {
+                CallOnError(ex);
+            }
+        }
 
-        private async void StartListen()
+
+        private async void StartReceive()
         {
             var buffer = new byte[ReceiveChunkSize];
 
@@ -115,20 +161,32 @@ namespace Websockets.Net
                 while (_ws.State == WebSocketState.Open)
                 {
                     var stringResult = new StringBuilder();
+                    byte[] data = new byte[0];
+                    var totallen = 0;
 
                     WebSocketReceiveResult result;
                     do
                     {
-                        result = await _ws.ReceiveAsync(new ArraySegment<byte>(buffer), _cancellationToken);
+                        result = await _ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None); // no cancellation because we get state aborted
 
-                        if (result.MessageType == WebSocketMessageType.Close ||
-                            result.MessageType == WebSocketMessageType.Close)
+                        if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            await _ws.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+                            await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "2", CancellationToken.None); // no cancellation because we get state aborted
                             CallOnDisconnected();
                             Dispose();
 
                             return;
+                        }
+                        else if (result.MessageType == WebSocketMessageType.Binary)
+                        {
+                            var data2 = new byte[totallen + result.Count];
+                            data.CopyTo(data2, 0);
+                            for (int i = 0; i < result.Count; i++)
+                            {
+                                data2[totallen + i] = buffer[i];
+                            }
+                            data = data2;
+                            totallen += result.Count;
                         }
                         else
                         {
@@ -137,11 +195,19 @@ namespace Websockets.Net
                         }
 
                     } while (!result.EndOfMessage);
-                    CallOnMessage(stringResult);
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        CallOnMessage(stringResult);
+                    }
+                    else if (result.MessageType == WebSocketMessageType.Binary)
+                    {
+                        CallOnData(data);
+                    }
                 }
             }
             catch (Exception ex)
             {
+                CallOnError(ex);
                 CallOnDisconnected();
             }
         }
@@ -151,6 +217,13 @@ namespace Websockets.Net
             var ev = MessageReceived;
             if (ev != null)
                 RunInTask(() => ev(stringResult.ToString(), this));
+        }
+
+        private void CallOnData(byte[] data)
+        {
+            var ev = DataReceived;
+            if (ev != null)
+                RunInTask(() => ev(data, this));
         }
 
         private void CallOnDisconnected()
@@ -183,8 +256,7 @@ namespace Websockets.Net
         {
             if (_ws != null)
             {
-                _cancellationTokenSource.Cancel();
-                _ws.Dispose();
+                Disconnect();
                 _ws = null;
             }
         }

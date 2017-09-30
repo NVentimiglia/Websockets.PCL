@@ -10,6 +10,7 @@ namespace Websockets.DroidTests
     {
         protected override void OnCreate(Bundle bundle)
         {
+            Droid.WebsocketConnection.Link();
             AddTest(Assembly.GetExecutingAssembly());
             base.OnCreate(bundle);
         }

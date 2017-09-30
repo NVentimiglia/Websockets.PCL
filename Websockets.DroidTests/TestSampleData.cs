@@ -7,12 +7,9 @@ using System.Threading;
 namespace Websockets.DroidTests
 {
     [TestFixture]
-    public class TestSample
+    public class TestSampleData
     {
-        public static readonly string WSECHOD_URL = "wss://wsecho.n4v.eu";
-        //public static readonly string WSECHOD_URL = "wss://10.0.2.2:8081";
-
-        private IWebSocketConnection connection;
+        private Websockets.IWebSocketConnection connection;
         private bool Failed;
         private bool Echo;
 
@@ -23,18 +20,18 @@ namespace Websockets.DroidTests
             //Websockets.Droid.WebsocketConnection.Link();
         }
 
-
         [Test]
         public async void DoTest()
         {
             // 2) Call factory from your PCL code.
-            // This is the same as new   Websockets.Droid.WebsocketConnection();
+            // This is the same as new   Websockets.Droid.Websocketconnection();
             // Except that the Factory is in a PCL and accessible anywhere
             connection = Websockets.WebSocketFactory.Create();
             connection.SetIsAllTrusted();
             connection.OnLog += Connection_OnLog;
             connection.OnError += Connection_OnError;
             connection.OnMessage += Connection_OnMessage;
+            connection.OnData += Connection_OnData;
             connection.OnOpened += Connection_OnOpened;
 
             //Timeout / Setup
@@ -46,7 +43,7 @@ namespace Websockets.DroidTests
 
             Debug.WriteLine("Connecting...");
 
-            connection.Open(WSECHOD_URL);
+            connection.Open(TestSample.WSECHOD_URL);
 
             while (!connection.IsOpen && !Failed)
             {
@@ -63,7 +60,8 @@ namespace Websockets.DroidTests
 
             Debug.WriteLine("Sending...");
 
-            connection.Send("Hello World");
+            var data = new byte[] { 0, (byte)'H', (byte)'I' };
+            connection.Send(data);
 
             Debug.WriteLine("Sent !");
 
@@ -113,9 +111,27 @@ namespace Websockets.DroidTests
             Echo = obj == "Hello World";
         }
 
-        private void Connection_OnError(Exception ex)
+        private void Connection_OnData(byte[] data)
         {
-            Trace.WriteLine("ERROR " + ex.ToString());
+            Echo = false;
+            var compare = new byte[] { 0, (byte)'H', (byte)'I' };
+            if (data.Length == compare.Length)
+            {
+                for (int i = 0; i < data.Length; i++)
+                {
+                    if (data[i] != compare[i])
+                    {
+                        return;
+                    }
+                }
+                Echo = true;
+                return;
+            }
+        }
+
+        private void Connection_OnError(Exception obj)
+        {
+            Trace.WriteLine("ERROR " + obj.ToString());
             Failed = true;
         }
 
