@@ -13,8 +13,9 @@ namespace Websockets.Ios
         public event Action OnClosed = delegate { };
         public event Action OnOpened = delegate { };
         public event Action<IWebSocketConnection> OnDispose = delegate { };
-        public event Action<string> OnError = delegate { };
+        public event Action<Exception> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
+        public event Action<byte[]> OnData = delegate { };
         public event Action<string> OnLog = delegate { };
 
         static WebsocketConnection()
@@ -75,7 +76,7 @@ namespace Websockets.Ios
             }
             catch (Exception ex)
             {
-                OnError(ex.Message);
+                OnError(ex);
             }
         }
 
@@ -107,7 +108,7 @@ namespace Websockets.Ios
             }
             catch (Exception ex)
             {
-                OnError(ex.Message);
+                OnError(ex);
             }
         }
 
@@ -120,8 +121,26 @@ namespace Websockets.Ios
             }
             catch (Exception ex)
             {
-                OnError(ex.Message);
+                OnError(ex);
             }
+        }
+
+        public void Send(byte[] data)
+        {
+            try
+            {
+                if (_client != null)
+                    _client.Send(NSData.FromArray(data));
+            }
+            catch (Exception ex)
+            {
+                OnError(ex);
+            }
+        }
+
+        public void SetIsAllTrusted()
+        {
+
         }
 
         public void Dispose()
@@ -140,13 +159,45 @@ namespace Websockets.Ios
             OnOpened();
         }
 
+        class ExceptionWrapper : Exception
+        {
+            private NSError err;
+            public ExceptionWrapper(NSError err) : base(err.Description)
+            {
+                this.err = err;
+
+            }
+
+            public override string Message => base.Message;
+
+            public override string StackTrace
+            {
+                get { return string.Format("code: %s - %s", err.Code.ToString(), err.LocalizedFailureReason); }
+            }
+
+            public override Exception GetBaseException()
+            {
+                return null;
+            }
+
+            public override string ToString()
+            {
+                return err.ToString();
+            }
+        }
+
         private void _client_WebSocketFailed(object sender, WebSocketFailedEventArgs e)
         {
 
             if (e.Error != null)
-                OnError(e.Error.Description);
+            {
+                var ex = new ExceptionWrapper(e.Error);
+                OnError(ex);
+            }
             else
-                OnError("Unknown WebSocket Error!");
+            {
+                OnError(new Exception("Unknown WebSocket Error!"));
+            }
 
             if (IsOpen)
             {
@@ -163,7 +214,16 @@ namespace Websockets.Ios
         private void _client_ReceivedMessage(object sender, WebSocketReceivedMessageEventArgs e)
         {
             if (e != null && e.Message != null)
-                OnMessage(e.Message.ToString());
+            {
+                if (e.Message is NSString)
+                {
+                    OnMessage(e.Message.ToString());
+                }
+                else
+                {
+                    OnData(((NSData)e.Message).ToArray());
+                }
+            }
         }
     }
 }

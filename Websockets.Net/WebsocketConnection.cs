@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Websockets.Net
 {
@@ -13,13 +17,21 @@ namespace Websockets.Net
         public event Action OnClosed = delegate { };
         public event Action OnOpened = delegate { };
         public event Action<IWebSocketConnection> OnDispose = delegate { };
-        public event Action<string> OnError = delegate { };
+        public event Action<Exception> OnError = delegate { };
         public event Action<string> OnMessage = delegate { };
+        public event Action<byte[]> OnData = delegate { };
         public event Action<string> OnLog = delegate { };
 
-        static WebsocketConnection()
+        static bool AllTrustedValidationCallback(object req, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
         {
-            System.Net.ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+            Debug.WriteLine("protocol: " + ((HttpWebRequest)req).ProtocolVersion.ToString());
+            Debug.WriteLine("cert: " + certificate.Subject);
+            foreach (X509ChainElement el in chain.ChainElements)
+            {
+                Debug.WriteLine("chain: " + el.Certificate.Subject);
+            }
+            Debug.WriteLine("policyerror: " + (errors.ToString()));
+            return true;
         }
 
         /// <summary>
@@ -31,6 +43,7 @@ namespace Websockets.Net
         }
 
         private WebSocketWrapper _websocket = null;
+        private static bool _isAllTrusted = false;
 
         public void Open(string url, string protocol = null, string authToken = null)
         {
@@ -55,18 +68,19 @@ namespace Websockets.Net
                 _websocket.Opened += _websocket_Opened;
                 _websocket.Error += _websocket_Error;
                 _websocket.MessageReceived += _websocket_MessageReceived;
+                _websocket.DataReceived += _websocket_DataReceived;
 
                 if (url.StartsWith("https"))
                     url = url.Replace("https://", "wss://");
                 else if (url.StartsWith("http"))
                     url = url.Replace("http://", "ws://");
-                
+
                 await _websocket.Connect(url, protocol, headers);
 
             }
             catch (Exception ex)
             {
-                OnError(ex.Message);
+                OnError(ex);
             }
         }
 
@@ -80,11 +94,24 @@ namespace Websockets.Net
             await _websocket.SendMessage(message);
         }
 
+        public async void Send(byte[] data)
+        {
+            await _websocket.SendData(data);
+        }
 
         public void Dispose()
         {
             Close();
             OnDispose(this);
+        }
+
+        public void SetIsAllTrusted()
+        {
+            if (!_isAllTrusted)
+            {
+                _isAllTrusted = true;
+                ServicePointManager.ServerCertificateValidationCallback += AllTrustedValidationCallback;
+            }
         }
 
         //
@@ -96,6 +123,7 @@ namespace Websockets.Net
                 _websocket.Opened -= _websocket_Opened;
                 _websocket.Error -= _websocket_Error;
                 _websocket.MessageReceived -= _websocket_MessageReceived;
+                _websocket.DataReceived -= _websocket_DataReceived;
                 _websocket.Dispose();
                 _websocket = null;
 
@@ -105,9 +133,9 @@ namespace Websockets.Net
         }
 
 
-        void _websocket_Error(Exception obj)
+        void _websocket_Error(Exception ex)
         {
-            OnError(obj.Message);
+            OnError(ex);
         }
 
         void _websocket_Opened(WebSocketWrapper arg)
@@ -121,6 +149,12 @@ namespace Websockets.Net
         {
 
             OnMessage(m);
+        }
+
+        void _websocket_DataReceived(byte[] data, WebSocketWrapper arg)
+        {
+
+            OnData(data);
         }
 
         void _websocket_Closed(WebSocketWrapper arg)

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Websockets.NetTests
 {
-    public class TestsSample
+    public class TestSample
     {
         private Websockets.IWebSocketConnection connection;
         private bool Failed;
@@ -14,29 +15,34 @@ namespace Websockets.NetTests
         public void Setup()
         {
             // 1) Link in your main activity
-            Websockets.Net.WebsocketConnection.Link();
+            //Websockets.Net.WebsocketConnection.Link();
         }
 
         
-        public async void DoTest()
+        public async Task DoTest()
         {
             // 2) Call factory from your PCL code.
             // This is the same as new   Websockets.Droid.WebsocketConnectionDroid();
             // Except that the Factory is in a PCL and accessible anywhere
             connection = Websockets.WebSocketFactory.Create();
+            connection.SetIsAllTrusted();
             connection.OnLog += Connection_OnLog;
             connection.OnError += Connection_OnError;
             connection.OnMessage += Connection_OnMessage;
             connection.OnOpened += Connection_OnOpened;
+            connection.OnClosed += Connection_OnClosed;
+            connection.OnDispose += Connection_OnDispose;
 
             //Timeout / Setup
             Echo = Failed = false;
-            Timeout();
+            var token = new CancellationTokenSource();
+            Timeout(token.Token);
 
             //Do test
 
-            Console.WriteLine("Connecting...");
-            connection.Open("http://echo.websocket.org");
+            Debug.WriteLine("Connecting...");
+
+            connection.Open(Program.WSECHOD_URL);
 
             while (!connection.IsOpen && !Failed)
             {
@@ -44,13 +50,18 @@ namespace Websockets.NetTests
             }
 
             if (!connection.IsOpen)
+            {
+                token.Cancel();
+                Assert.True(false);
                 return;
-            Console.WriteLine("Connected !");
+            }
+            Debug.WriteLine("Connected !");
 
-            System.Diagnostics.Trace.WriteLine("HI");
-            Console.WriteLine("Sending...");
+            Debug.WriteLine("Sending...");
+
             connection.Send("Hello World");
-            Console.WriteLine("Sent !");
+
+            Debug.WriteLine("Sent !");
 
             while (!Echo && !Failed)
             {
@@ -58,11 +69,20 @@ namespace Websockets.NetTests
             }
 
             if (!Echo)
+            {
+                token.Cancel();
+                connection.Dispose();
+                Assert.True(Echo);
                 return;
+            }
 
-            Console.WriteLine("Received !");
+            token.Cancel();
+            connection.Dispose();
 
-            Console.WriteLine("Passed !");
+            Debug.WriteLine("Received !");
+
+            Debug.WriteLine("Passed !");
+            Assert.True(true);
         }
 
         private void Connection_OnOpened()
@@ -70,27 +90,46 @@ namespace Websockets.NetTests
             Debug.WriteLine("Opened !");
         }
 
-        async void Timeout()
+        private void Connection_OnClosed()
         {
-            await Task.Delay(120000);
-            Failed = true;
-            Debug.WriteLine("Timeout");
+            Debug.WriteLine("Closed !");
+        }
+
+        async void Timeout(CancellationToken token)
+        {
+            try
+            {
+                var t = Task.Delay(30000, token);
+                await t;
+                if (!t.IsCanceled)
+                {
+                    Debug.WriteLine("Timeout");
+                    Failed = true;
+                }
+            }
+            catch (TaskCanceledException) { }
         }
 
         private void Connection_OnMessage(string obj)
         {
             Echo = obj == "Hello World";
         }
-
-        private void Connection_OnError(string obj)
+        
+        private void Connection_OnError(Exception ex)
         {
-            Trace.Write("ERROR " + obj);
+            Trace.WriteLine("ERROR " + ex.ToString());
             Failed = true;
         }
 
         private void Connection_OnLog(string obj)
         {
-            Trace.Write(obj);
+            Trace.WriteLine(obj);
         }
+
+        private void Connection_OnDispose(IWebSocketConnection c)
+        {
+            Trace.WriteLine(GetType().ToString() + " dispose");
+        }
+
     }
 }
