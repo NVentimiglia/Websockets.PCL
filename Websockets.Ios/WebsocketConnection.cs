@@ -98,7 +98,7 @@ namespace Websockets.Ios
 
                     _client.Dispose();
                     _client = null;
-
+					IsOpen = false;
                     var ev = OnClosed;
                     if (ev != null)
                     {
@@ -188,7 +188,8 @@ namespace Websockets.Ios
 
         private void _client_WebSocketFailed(object sender, WebSocketFailedEventArgs e)
         {
-
+			bool wasOpen = IsOpen;
+			IsOpen = false;
             if (e.Error != null)
             {
                 var ex = new ExceptionWrapper(e.Error);
@@ -199,7 +200,7 @@ namespace Websockets.Ios
                 OnError(new Exception("Unknown WebSocket Error!"));
             }
 
-            if (IsOpen)
+			if (wasOpen)
             {
                 OnClosed();
             }
